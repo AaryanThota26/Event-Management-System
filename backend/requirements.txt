@@ -1,0 +1,25 @@
+# Event Management System - Backend Dependencies
+
+# Web Framework
+fastapi==0.115.12
+uvicorn[standard]==0.34.2
+python-multipart==0.0.20
+
+# Database
+sqlalchemy==2.0.41
+psycopg2-binary==2.9.10
+alembic==1.15.2
+
+# Environment & Settings
+python-dotenv==1.1.0
+pydantic-settings==2.9.1
+pydantic[email]==2.11.4
+email-validator==2.3.0
+
+# Authentication (for later phases)
+python-jose[cryptography]==3.4.0
+passlib[bcrypt]==1.7.4
+bcrypt==4.3.0
+
+# Utilities
+python-dateutil==2.9.0
