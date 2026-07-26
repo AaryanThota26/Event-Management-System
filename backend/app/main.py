@@ -7,7 +7,7 @@ Main entry point for the backend API.
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
-from app.api import auth_router, events_router
+from app.api import auth_router, events_router, registrations_router
 
 
 def create_app() -> FastAPI:
@@ -41,9 +41,11 @@ def create_app() -> FastAPI:
         prefix="/api/events",
         tags=["Events"],
     )
-
-    # Future routers will be added here:
-    # app.include_router(registrations_router, prefix="/api/registrations", tags=["Registrations"])
+    app.include_router(
+        registrations_router,
+        prefix="/api/registrations",
+        tags=["Registrations"],
+    )
 
     @app.get("/", tags=["Health"])
     def root():

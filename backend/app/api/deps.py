@@ -27,7 +27,7 @@ Usage in any route:
 from typing import Annotated, Optional
 
 from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
@@ -36,12 +36,12 @@ from app.utils.security import decode_access_token
 
 
 # ---------------------------------------------------------------------------
-# OAuth2 Scheme — tells Swagger to show the "Authorize" button
+# HTTP Bearer Scheme — tells Swagger to show the "Authorize" button
+# Accepts only a JWT access token (no username/password fields)
 # ---------------------------------------------------------------------------
 
-oauth2_scheme = OAuth2PasswordBearer(
-    tokenUrl="/api/auth/login",
-    description="Paste your JWT access token here",
+security_scheme = HTTPBearer(
+    description="Paste your JWT access token here (without 'Bearer' prefix)",
 )
 
 
@@ -50,14 +50,14 @@ oauth2_scheme = OAuth2PasswordBearer(
 # ---------------------------------------------------------------------------
 
 async def get_current_user(
-    token: Annotated[str, Depends(oauth2_scheme)],
+    credentials: Annotated[HTTPAuthorizationCredentials, Depends(security_scheme)],
     db: Annotated[Session, Depends(get_db)],
 ) -> User:
     """
     Dependency that extracts and validates the current user from a JWT token.
 
     Flow:
-        1. FastAPI extracts the token from the Authorization: Bearer <token> header
+        1. FastAPI extracts the Bearer token from the Authorization header
         2. We decode the token and get the user ID
         3. We look up the user in the database
         4. Return the User object (or raise 401)
@@ -68,6 +68,7 @@ async def get_current_user(
         401 Unauthorized — if token is missing, expired, or invalid
         401 Unauthorized — if user ID from token doesn't exist in DB
     """
+    token = credentials.credentials
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",

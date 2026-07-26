@@ -22,7 +22,12 @@ from app.schemas.event import (
     EventListResponse,
 )
 from app.schemas.auth import MessageResponse
+from app.schemas.registration import (
+    RegistrationResponse,
+    EventParticipantsResponse,
+)
 from app.services import event_service as svc
+from app.services import registration_service as reg_svc
 
 router = APIRouter()
 
@@ -162,3 +167,71 @@ def reject_event(
     user: Annotated[User, Depends(require_role(UserRole.ADMIN))],
 ):
     return svc.reject_event(db, event_id)
+
+
+# ---------------------------------------------------------------------------
+# POST /api/events/{event_id}/register — Register for Event (User only)
+# ---------------------------------------------------------------------------
+
+@router.post(
+    "/{event_id}/register",
+    response_model=RegistrationResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Register for an event",
+    description=(
+        "Register the authenticated user for an event. "
+        "Only users with the 'user' role can register. "
+        "Organizers cannot register for their own events. "
+        "Event must be approved and have available capacity."
+    ),
+)
+def register_for_event(
+    event_id: int,
+    db: Annotated[Session, Depends(get_db)],
+    user: Annotated[User, Depends(require_role(UserRole.USER))],
+):
+    return reg_svc.register_for_event(db, event_id, user)
+
+
+# ---------------------------------------------------------------------------
+# DELETE /api/events/{event_id}/register — Cancel Registration (User only)
+# ---------------------------------------------------------------------------
+
+@router.delete(
+    "/{event_id}/register",
+    response_model=MessageResponse,
+    summary="Cancel event registration",
+    description=(
+        "Cancel the authenticated user's registration for an event. "
+        "Only users with the 'user' role can cancel."
+    ),
+)
+def cancel_registration(
+    event_id: int,
+    db: Annotated[Session, Depends(get_db)],
+    user: Annotated[User, Depends(require_role(UserRole.USER))],
+):
+    reg_svc.cancel_registration(db, event_id, user)
+    return MessageResponse(message=f"Registration for event {event_id} cancelled successfully")
+
+
+# ---------------------------------------------------------------------------
+# GET /api/events/{event_id}/participants — View Event Participants
+# ---------------------------------------------------------------------------
+
+@router.get(
+    "/{event_id}/participants",
+    response_model=EventParticipantsResponse,
+    summary="View event participants",
+    description=(
+        "View all registered participants for an event. "
+        "Organizers can view participants for their own events only. "
+        "Admins can view participants for any event."
+    ),
+)
+def get_event_participants(
+    event_id: int,
+    db: Annotated[Session, Depends(get_db)],
+    user: Annotated[User, Depends(require_role(UserRole.ORGANIZER, UserRole.ADMIN))],
+):
+    return reg_svc.get_event_participants(db, event_id, user)
