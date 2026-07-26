@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EventPro | Admin Oversight</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9ff;
+            color: #0b1c30;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .sidebar-active {
+            border-left: 4px solid #004ac6;
+        }
+        /* Custom Scrollbar for high-density tables */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-secondary-fixed-variant": "#454747",
+                      "on-secondary-container": "#616363",
+                      "secondary": "#5d5f5f",
+                      "primary-fixed-dim": "#b4c5ff",
+                      "secondary-container": "#dfe0e0",
+                      "surface-container-low": "#eff4ff",
+                      "on-primary-fixed-variant": "#003ea8",
+                      "tertiary-fixed": "#dae2fd",
+                      "tertiary": "#4d556b",
+                      "secondary-fixed-dim": "#c6c6c7",
+                      "surface-dim": "#cbdbf5",
+                      "on-primary": "#ffffff",
+                      "outline": "#737686",
+                      "surface-variant": "#d3e4fe",
+                      "outline-variant": "#c3c6d7",
+                      "on-error-container": "#93000a",
+                      "surface-bright": "#f8f9ff",
+                      "inverse-primary": "#b4c5ff",
+                      "on-background": "#0b1c30",
+                      "secondary-fixed": "#e2e2e2",
+                      "surface": "#f8f9ff",
+                      "surface-container-highest": "#d3e4fe",
+                      "surface-tint": "#0053db",
+                      "on-primary-container": "#eeefff",
+                      "on-surface": "#0b1c30",
+                      "tertiary-fixed-dim": "#bec6e0",
+                      "on-secondary-fixed": "#1a1c1c",
+                      "error": "#ba1a1a",
+                      "background": "#f8f9ff",
+                      "on-tertiary": "#ffffff",
+                      "primary-container": "#2563eb",
+                      "on-primary-fixed": "#00174b",
+                      "on-surface-variant": "#434655",
+                      "on-secondary": "#ffffff",
+                      "on-tertiary-fixed-variant": "#3f465c",
+                      "on-tertiary-fixed": "#131b2e",
+                      "surface-container-lowest": "#ffffff",
+                      "primary-fixed": "#dbe1ff",
+                      "error-container": "#ffdad6",
+                      "surface-container-high": "#dce9ff",
+                      "surface-container": "#e5eeff",
+                      "tertiary-container": "#656d84",
+                      "on-error": "#ffffff",
+                      "inverse-surface": "#213145",
+                      "inverse-on-surface": "#eaf1ff",
+                      "primary": "#004ac6",
+                      "on-tertiary-container": "#eef0ff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "xl": "32px",
+                      "2xl": "48px",
+                      "md": "16px",
+                      "gutter": "24px",
+                      "base": "4px",
+                      "sm": "8px",
+                      "3xl": "64px",
+                      "container-max": "1440px",
+                      "sidebar-width": "280px",
+                      "xs": "4px",
+                      "lg": "24px"
+              },
+              "fontFamily": {
+                      "headline-sm": ["Inter"],
+                      "body-sm": ["Inter"],
+                      "headline-md": ["Inter"],
+                      "display-lg": ["Inter"],
+                      "headline-lg": ["Inter"],
+                      "label-sm": ["Inter"],
+                      "body-md": ["Inter"],
+                      "label-md": ["Inter"],
+                      "body-lg": ["Inter"]
+              },
+              "fontSize": {
+                      "headline-sm": ["20px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                      "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                      "headline-md": ["24px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                      "display-lg": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "headline-lg": ["32px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "label-sm": ["12px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                      "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                      "label-md": ["14px", {"lineHeight": "1.4", "fontWeight": "500"}],
+                      "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}]
+              }
+            },
+          },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface">
+<!-- Sidebar Navigation -->
+<aside class="w-sidebar-width h-screen fixed left-0 top-0 bg-surface-container-lowest border-r border-outline-variant flex flex-col p-md gap-sm z-40 hidden lg:flex">
+<div class="flex flex-col gap-xs mb-xl">
+<div class="flex items-center gap-sm px-sm">
+<div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined">dashboard_customize</span>
+</div>
+<div>
+<h1 class="font-headline-sm text-headline-sm font-bold text-primary">Tech Events Co.</h1>
+<p class="font-label-md text-label-md text-on-surface-variant">Admin Console</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 flex flex-col gap-xs">
+<a class="flex items-center gap-md bg-surface-container-high text-primary rounded-lg px-md py-sm border-l-4 border-primary transition-all scale-98 active:scale-95" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Overview</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container rounded-lg transition-all scale-98 active:scale-95" href="#">
+<span class="material-symbols-outlined">event</span>
+<span class="font-label-md text-label-md">My Events</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container rounded-lg transition-all scale-98 active:scale-95" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-md text-label-md">Participants</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container rounded-lg transition-all scale-98 active:scale-95" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-label-md text-label-md">Revenue</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container rounded-lg transition-all scale-98 active:scale-95" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-label-md text-label-md">Resources</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container rounded-lg transition-all scale-98 active:scale-95" href="#">
+<span class="material-symbols-outlined">history</span>
+<span class="font-label-md text-label-md">Audit Logs</span>
+</a>
+</nav>
+<div class="mt-auto flex flex-col gap-xs pt-md border-t border-outline-variant">
+<div class="p-md bg-primary-fixed rounded-xl mb-md">
+<p class="font-label-sm text-label-sm text-on-primary-fixed font-bold mb-xs">PRO PLAN</p>
+<p class="font-body-sm text-body-sm text-on-primary-fixed-variant mb-sm">Unlocking advanced analytics</p>
+<button class="w-full py-xs bg-primary text-on-primary rounded-lg font-label-md text-label-md">Upgrade Plan</button>
+</div>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-label-md text-label-md">Logout</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="lg:ml-sidebar-width min-h-screen flex flex-col">
+<!-- Top App Bar -->
+<header class="sticky top-0 z-30 flex justify-between items-center w-full px-lg py-sm bg-surface shadow-sm border-b border-outline-variant">
+<div class="flex items-center gap-lg">
+<button class="lg:hidden p-xs">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h2 class="font-headline-md text-headline-md font-bold text-primary">Dashboard</h2>
+<div class="hidden md:flex items-center bg-surface-container rounded-full px-md py-xs gap-sm w-96">
+<span class="material-symbols-outlined text-on-surface-variant">search</span>
+<input class="bg-transparent border-none focus:ring-0 w-full font-body-md text-body-md" placeholder="Search events, users..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<div class="hidden md:flex gap-md border-r border-outline-variant pr-md mr-md">
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Dashboard</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Analytics</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Events</a>
+</div>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors cursor-pointer">notifications</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors cursor-pointer">help</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a corporate administrator, high resolution, clean background, neutral lighting, professional attire, modern business portrait style, focusing on a sense of reliability and competence." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6jqmBJSiFUxCbENDOySAS6Hkyfgf5e0pVOyMbJEBUC0TpdeITztIUeHsrODV7644OiBHk3jQsYMKOzrkEXydeUKCXgIDwqJsNluyMSlYrqnISBhJhv3niFnNCjh_bUEEH3RVym7LD5304eFJJtRmCPQ18FMqR7aNvqwz7Ub-9gd0x1CzbPW1x_IlUYHBzrGXDlmK8L5R8j2l06ImyAlWk1uO8F2ZErKsCFxLR7aS2FugNVuk807qE7PGv-LfL3uiFkYUArkBOPds"/>
+</div>
+<button class="bg-primary text-on-primary px-lg py-xs rounded-lg font-label-md text-label-md hover:opacity-90 transition-opacity">Create Event</button>
+</div>
+</header>
+<!-- Content Canvas -->
+<div class="p-lg flex flex-col gap-lg max-w-container-max mx-auto w-full">
+<!-- Quick Stats Bento Grid -->
+<section class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-gutter">
+<div class="bg-surface-container-lowest p-lg rounded-xl border border-outline-variant shadow-sm flex flex-col justify-between h-32 hover:shadow-md transition-shadow">
+<div class="flex justify-between items-start">
+<span class="material-symbols-outlined text-primary bg-primary-fixed p-xs rounded-lg">group</span>
+<span class="text-on-error font-label-sm bg-error px-xs rounded">+12%</span>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Total Users</p>
+<h3 class="font-headline-lg text-headline-lg">12,842</h3>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-lg rounded-xl border border-outline-variant shadow-sm flex flex-col justify-between h-32 hover:shadow-md transition-shadow">
+<div class="flex justify-between items-start">
+<span class="material-symbols-outlined text-tertiary bg-tertiary-fixed p-xs rounded-lg">calendar_today</span>
+<span class="text-on-primary font-label-sm bg-primary px-xs rounded">+8%</span>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Total Events</p>
+<h3 class="font-headline-lg text-headline-lg">1,402</h3>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-lg rounded-xl border border-outline-variant shadow-sm flex flex-col justify-between h-32 hover:shadow-md transition-shadow">
+<div class="flex justify-between items-start">
+<span class="material-symbols-outlined text-error bg-error-container p-xs rounded-lg">pending_actions</span>
+<span class="text-on-surface-variant font-label-sm bg-surface-container px-xs rounded">Critical</span>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Pending Approvals</p>
+<h3 class="font-headline-lg text-headline-lg">24</h3>
+</div>
+</div>
+<div class="bg-primary p-lg rounded-xl shadow-lg flex flex-col justify-between h-32 lg:col-span-1 md:col-span-3">
+<div class="flex justify-between items-start">
+<span class="material-symbols-outlined text-on-primary">trending_up</span>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-primary-container opacity-80 uppercase tracking-wider">Weekly Revenue</p>
+<h3 class="font-headline-lg text-headline-lg text-on-primary">$42,900</h3>
+</div>
+</div>
+</section>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
+<!-- User Growth Chart (Simulated High-Density UI) -->
+<section class="lg:col-span-2 bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm p-lg overflow-hidden relative">
+<div class="flex justify-between items-center mb-xl">
+<div>
+<h3 class="font-headline-sm text-headline-sm">User Growth Trends</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Monthly platform adoption rate across regions.</p>
+</div>
+<div class="flex gap-sm">
+<select class="bg-surface-container border-none rounded-lg font-label-md text-label-md py-xs px-md focus:ring-1 focus:ring-primary">
+<option>Last 6 Months</option>
+<option>Year to Date</option>
+</select>
+</div>
+</div>
+<div class="h-64 flex items-end justify-between gap-base px-sm">
+<!-- Simulated Bar Chart with Animation -->
+<div class="flex-1 bg-surface-container-high rounded-t-sm h-1/4 transition-all hover:bg-primary" title="Jan: 2400"></div>
+<div class="flex-1 bg-surface-container-high rounded-t-sm h-2/4 transition-all hover:bg-primary" title="Feb: 4100"></div>
+<div class="flex-1 bg-surface-container-high rounded-t-sm h-1/3 transition-all hover:bg-primary" title="Mar: 3200"></div>
+<div class="flex-1 bg-primary-fixed rounded-t-sm h-3/4 transition-all hover:bg-primary" title="Apr: 6800"></div>
+<div class="flex-1 bg-surface-container-high rounded-t-sm h-1/2 transition-all hover:bg-primary" title="May: 4500"></div>
+<div class="flex-1 bg-primary rounded-t-sm h-full transition-all hover:bg-primary-container" title="Jun: 9200"></div>
+<div class="flex-1 bg-surface-container-high rounded-t-sm h-2/3 transition-all hover:bg-primary" title="Jul: 5900"></div>
+<div class="flex-1 bg-surface-container-high rounded-t-sm h-3/5 transition-all hover:bg-primary" title="Aug: 5100"></div>
+<div class="flex-1 bg-surface-container-high rounded-t-sm h-4/5 transition-all hover:bg-primary" title="Sep: 7200"></div>
+<div class="flex-1 bg-surface-container-high rounded-t-sm h-1/2 transition-all hover:bg-primary" title="Oct: 4300"></div>
+<div class="flex-1 bg-primary-fixed-dim rounded-t-sm h-3/4 transition-all hover:bg-primary" title="Nov: 6100"></div>
+<div class="flex-1 bg-surface-container-high rounded-t-sm h-full transition-all hover:bg-primary" title="Dec: 8800"></div>
+</div>
+<div class="flex justify-between mt-sm text-on-surface-variant font-label-sm uppercase opacity-60">
+<span>Jan</span>
+<span>Jun</span>
+<span>Dec</span>
+</div>
+</section>
+<!-- Platform Health / Side Metric -->
+<section class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm p-lg flex flex-col">
+<h3 class="font-headline-sm text-headline-sm mb-md">System Health</h3>
+<div class="space-y-md">
+<div class="p-md bg-surface-container rounded-lg">
+<div class="flex justify-between mb-xs">
+<span class="font-label-md text-label-md">API Latency</span>
+<span class="font-label-md text-label-md text-primary">98ms</span>
+</div>
+<div class="w-full bg-outline-variant h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary w-4/5 h-full"></div>
+</div>
+</div>
+<div class="p-md bg-surface-container rounded-lg">
+<div class="flex justify-between mb-xs">
+<span class="font-label-md text-label-md">Storage Load</span>
+<span class="font-label-md text-label-md text-primary">62%</span>
+</div>
+<div class="w-full bg-outline-variant h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary w-[62%] h-full"></div>
+</div>
+</div>
+<div class="p-md bg-error-container rounded-lg border border-error/10">
+<div class="flex items-center gap-sm mb-xs">
+<span class="material-symbols-outlined text-error text-sm">report</span>
+<span class="font-label-md text-label-md text-on-error-container">Pending Reports</span>
+</div>
+<p class="font-headline-md text-headline-md text-on-error-container">12</p>
+</div>
+</div>
+<div class="mt-auto pt-lg">
+<button class="w-full py-sm border border-outline text-on-surface font-label-md text-label-md rounded-lg hover:bg-surface-container transition-colors">Run Diagnostics</button>
+</div>
+</section>
+</div>
+<!-- Recent Pending Events Table -->
+<section class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm overflow-hidden">
+<div class="p-lg border-b border-outline-variant flex justify-between items-center bg-surface">
+<div>
+<h3 class="font-headline-sm text-headline-sm">Recent Pending Events</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Events requiring administrative review before publication.</p>
+</div>
+<button class="text-primary font-label-md text-label-md flex items-center gap-xs hover:underline">
+                        View All <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container text-on-surface-variant">
+<tr>
+<th class="p-md font-label-sm text-label-sm border-b border-outline-variant">EVENT NAME</th>
+<th class="p-md font-label-sm text-label-sm border-b border-outline-variant">ORGANIZER</th>
+<th class="p-md font-label-sm text-label-sm border-b border-outline-variant">DATE</th>
+<th class="p-md font-label-sm text-label-sm border-b border-outline-variant">TICKETS</th>
+<th class="p-md font-label-sm text-label-sm border-b border-outline-variant">STATUS</th>
+<th class="p-md font-label-sm text-label-sm border-b border-outline-variant text-right">ACTIONS</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/30">
+<tr class="hover:bg-surface transition-colors group">
+<td class="p-md">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-lg bg-surface-variant overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="A professional tech conference banner design, vibrant gradients of blue and purple, minimalist geometric patterns, 3D abstract shapes, high-tech event aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC3The2wKTRRl92zKL_ZgIXpzoLuzcgA0ZEFzJ8N8JUwYwXLz5-mfvQlRVd5N_IAhDpmvglG1WvPuv_lURDm2z8wpNOXEExvBvOd32B20hGX41IbZZhmwP1RXoraRHKM7xQxAefpGpPJRIQ77yB5k3Tu6S-pLo6Oeub8DYnpNJDoBU23n9JDs-HQrXsFWRk3ReAYnhjwzaTUZsy9yilPhGhyAQFe9dIq4jNRAYPUwF1y8wNBUiXaLZd4YGkUKxJl9EtFYfbh6Pl8oU"/>
+</div>
+<div>
+<p class="font-label-md text-label-md font-bold">Global AI Summit 2024</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">San Francisco, CA</p>
+</div>
+</div>
+</td>
+<td class="p-md font-body-md text-body-md">TechVision Corp</td>
+<td class="p-md font-body-md text-body-md">Oct 12, 2024</td>
+<td class="p-md font-body-md text-body-md">5,000</td>
+<td class="p-md">
+<span class="px-sm py-xs bg-error-container text-on-error-container text-[10px] font-bold uppercase rounded-full">Pending</span>
+</td>
+<td class="p-md text-right">
+<div class="flex justify-end gap-sm opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="bg-primary text-on-primary p-sm rounded-lg hover:bg-primary-container transition-colors" title="Approve">
+<span class="material-symbols-outlined text-sm">check</span>
+</button>
+<button class="bg-error text-on-error p-sm rounded-lg hover:opacity-90 transition-colors" title="Reject">
+<span class="material-symbols-outlined text-sm">close</span>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-surface transition-colors group">
+<td class="p-md">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-lg bg-surface-variant overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="Minimalist design of a creative arts festival poster, soft pastel colors, organic brush strokes, elegant typography, high-end lifestyle event vibe." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA2t2rm48qWJbnfXH1IQOOXHHbDJryWOnulTu8UQ_yfbOpdNY7wKp-PZ3RM0WvHBH3P6V_4Saw2LQhWwF_ksVNmKKY3fXfU3AUq8_w8bYG5JMRqHblwmh8iPdpBakUulznuElzFRvvHMxbXBIgDLApeKY9SyNwUfApASl076l58cGQqohwwrXWi_cnd_hMla3ZKz8OVTkB1NRv9pOI8MQl5RegzzSlhCAk_-G2TwCiWag-jr_oM5BlflC9cLucOmqnNJHu0ck591X8"/>
+</div>
+<div>
+<p class="font-label-md text-label-md font-bold">Urban Art Showcase</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">London, UK</p>
+</div>
+</div>
+</td>
+<td class="p-md font-body-md text-body-md">Creative Hub</td>
+<td class="p-md font-body-md text-body-md">Nov 05, 2024</td>
+<td class="p-md font-body-md text-body-md">1,200</td>
+<td class="p-md">
+<span class="px-sm py-xs bg-error-container text-on-error-container text-[10px] font-bold uppercase rounded-full">Pending</span>
+</td>
+<td class="p-md text-right">
+<div class="flex justify-end gap-sm opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="bg-primary text-on-primary p-sm rounded-lg hover:bg-primary-container transition-colors" title="Approve">
+<span class="material-symbols-outlined text-sm">check</span>
+</button>
+<button class="bg-error text-on-error p-sm rounded-lg hover:opacity-90 transition-colors" title="Reject">
+<span class="material-symbols-outlined text-sm">close</span>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-surface transition-colors group">
+<td class="p-md">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-lg bg-surface-variant overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="Corporate networking dinner event background, luxurious interior, warm ambient lighting, bokeh effect of crystal glasses, sophisticated and elite atmosphere." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDNt0t0a8gQb7vwQCD44k0BjhQ3_Cmh0xKJwETdu6PCDBuGijDe5-EvL1eeHx_NY9EtWDFlBVSZXq8Fek_v-5ugf8nat21M6r25bLVD1QFCtg0GBIcayy1BJTkw_7nFhhbYtZTpp7f_3H_ybVuLtTBpVedVkr30id39JPQXaDgZbSe_Z46BuIEsit9xLE50x3JVDrLiBkOGW5gOGgB8JFVllBaPpl91akgPMjtWk_lprQdS-fZ08oJRHU1vLhqV4LoB0L1vN5N1PC8"/>
+</div>
+<div>
+<p class="font-label-md text-label-md font-bold">Exec-Network Gala</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">New York, NY</p>
+</div>
+</div>
+</td>
+<td class="p-md font-body-md text-body-md">Elite Networks</td>
+<td class="p-md font-body-md text-body-md">Dec 20, 2024</td>
+<td class="p-md font-body-md text-body-md">450</td>
+<td class="p-md">
+<span class="px-sm py-xs bg-error-container text-on-error-container text-[10px] font-bold uppercase rounded-full">Pending</span>
+</td>
+<td class="p-md text-right">
+<div class="flex justify-end gap-sm opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="bg-primary text-on-primary p-sm rounded-lg hover:bg-primary-container transition-colors" title="Approve">
+<span class="material-symbols-outlined text-sm">check</span>
+</button>
+<button class="bg-error text-on-error p-sm rounded-lg hover:opacity-90 transition-colors" title="Reject">
+<span class="material-symbols-outlined text-sm">close</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-md border-t border-outline-variant flex justify-between items-center bg-surface">
+<p class="font-body-sm text-body-sm text-on-surface-variant">Showing 3 of 24 pending events</p>
+<div class="flex gap-xs">
+<button class="p-xs hover:bg-surface-container rounded border border-outline-variant disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="p-xs hover:bg-surface-container rounded border border-outline-variant">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+</section>
+</div>
+<!-- Footer -->
+<footer class="mt-auto p-lg text-center border-t border-outline-variant">
+<p class="font-label-sm text-label-sm text-on-surface-variant">© 2024 Tech Events Co. All systems operational. Admin Console v2.4.0</p>
+</footer>
+</main>
+<script>
+        // Micro-interaction for approval buttons
+        document.querySelectorAll('[title="Approve"]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const row = this.closest('tr');
+                row.style.transition = 'opacity 0.5s ease';
+                row.style.opacity = '0';
+                setTimeout(() => {
+                    row.remove();
+                    // Optionally update the counter in UI
+                }, 500);
+            });
+        });
+
+        document.querySelectorAll('[title="Reject"]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                if(confirm('Are you sure you want to reject this event?')) {
+                    const row = this.closest('tr');
+                    row.style.backgroundColor = '#ffdad6';
+                    row.style.transition = 'opacity 0.5s ease';
+                    row.style.opacity = '0';
+                    setTimeout(() => {
+                        row.remove();
+                    }, 500);
+                }
+            });
+        });
+    </script>
+</body></html>
