@@ -4,6 +4,8 @@ import { useAuth } from './hooks/useAuth'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
 import Dashboard from './pages/Dashboard'
+import Events from './pages/Events'
+import EventDetail from './pages/EventDetail'
 import './App.css'
 
 function ProtectedRoute({ children }) {
@@ -48,6 +50,22 @@ function App() {
                 <PublicRoute>
                   <Signup />
                 </PublicRoute>
+              }
+            />
+            <Route
+              path="/events"
+              element={
+                <ProtectedRoute>
+                  <Events />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/events/:id"
+              element={
+                <ProtectedRoute>
+                  <EventDetail />
+                </ProtectedRoute>
               }
             />
             <Route

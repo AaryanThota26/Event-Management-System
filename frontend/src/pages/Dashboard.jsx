@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import EventProLogo from '../components/EventProLogo'
 
@@ -44,11 +45,11 @@ const Dashboard = () => {
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-lg">
-          <div className="bg-surface-container-lowest rounded-xl border border-outline-variant p-lg">
+          <Link to="/events" className="bg-surface-container-lowest rounded-xl border border-outline-variant p-lg hover:shadow-md hover:border-primary/30 transition-all block">
             <span className="material-symbols-outlined text-primary text-3xl mb-sm">calendar_today</span>
             <h2 className="font-headline-sm text-headline-sm text-on-surface mb-xs">Events</h2>
-            <p className="font-body-sm text-body-sm text-on-surface-variant">View and manage events</p>
-          </div>
+            <p className="font-body-sm text-body-sm text-on-surface-variant">Browse and manage events</p>
+          </Link>
           <div className="bg-surface-container-lowest rounded-xl border border-outline-variant p-lg">
             <span className="material-symbols-outlined text-primary text-3xl mb-sm">group</span>
             <h2 className="font-headline-sm text-headline-sm text-on-surface mb-xs">Registrations</h2>
