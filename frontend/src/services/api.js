@@ -9,10 +9,13 @@ import apiConfig from '../utils/apiConfig'
 
 const api = axios.create(apiConfig)
 
-// Request interceptor - will add JWT token in later phases
+// Request interceptor — attach JWT token from localStorage
 api.interceptors.request.use(
   (config) => {
-    // TODO: Add Authorization header with JWT token
+    const token = localStorage.getItem('eventpro_token')
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
     return config
   },
   (error) => {
@@ -20,11 +23,15 @@ api.interceptors.request.use(
   }
 )
 
-// Response interceptor - will handle errors globally
+// Response interceptor — handle 401 by clearing auth and redirecting
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    // TODO: Handle 401 unauthorized, redirect to login
+    if (error.response?.status === 401) {
+      localStorage.removeItem('eventpro_token')
+      localStorage.removeItem('eventpro_user')
+      window.location.href = '/login'
+    }
     return Promise.reject(error)
   }
 )
