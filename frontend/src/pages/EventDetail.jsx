@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import api from '../services/api'
+import { useAuth } from '../hooks/useAuth'
 
 const STATUS_STYLES = {
   approved: { bg: 'bg-green-100', text: 'text-green-700', label: 'Approved' },
@@ -10,10 +11,18 @@ const STATUS_STYLES = {
 
 const EventDetail = () => {
   const { id } = useParams()
+  const { user } = useAuth()
   const [event, setEvent] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
+  // Registration state
+  const [isRegistered, setIsRegistered] = useState(false)
+  const [checkingRegistration, setCheckingRegistration] = useState(false)
+  const [registering, setRegistering] = useState(false)
+  const [notification, setNotification] = useState(null)
+
+  // Fetch event details
   useEffect(() => {
     const fetchEvent = async () => {
       setLoading(true)
@@ -29,6 +38,72 @@ const EventDetail = () => {
     }
     fetchEvent()
   }, [id])
+
+  // Check if user is already registered for this event
+  useEffect(() => {
+    if (!user || user.role !== 'user' || !id) return
+
+    const checkRegistration = async () => {
+      setCheckingRegistration(true)
+      try {
+        const { data } = await api.get('/api/registrations/my', {
+          params: { limit: 100 },
+        })
+        const registered = data.some(
+          (reg) => String(reg.event.id) === String(id)
+        )
+        setIsRegistered(registered)
+      } catch {
+        // Silently fail — register button will still work
+      } finally {
+        setCheckingRegistration(false)
+      }
+    }
+    checkRegistration()
+  }, [user, id])
+
+  // Handle register
+  const handleRegister = async () => {
+    setRegistering(true)
+    setNotification(null)
+    try {
+      await api.post(`/api/events/${id}/register`)
+      setIsRegistered(true)
+      setNotification({ type: 'success', text: 'Successfully registered for this event!' })
+    } catch (err) {
+      setNotification({
+        type: 'error',
+        text: err.response?.data?.detail || 'Failed to register. Please try again.',
+      })
+    } finally {
+      setRegistering(false)
+    }
+  }
+
+  // Handle cancel registration
+  const handleCancel = async () => {
+    setRegistering(true)
+    setNotification(null)
+    try {
+      await api.delete(`/api/events/${id}/register`)
+      setIsRegistered(false)
+      setNotification({ type: 'success', text: 'Registration cancelled successfully.' })
+    } catch (err) {
+      setNotification({
+        type: 'error',
+        text: err.response?.data?.detail || 'Failed to cancel registration. Please try again.',
+      })
+    } finally {
+      setRegistering(false)
+    }
+  }
+
+  // Auto-dismiss notification after 4 seconds
+  useEffect(() => {
+    if (!notification) return
+    const timer = setTimeout(() => setNotification(null), 4000)
+    return () => clearTimeout(timer)
+  }, [notification])
 
   const formatDate = (dateStr) => {
     const d = new Date(dateStr + 'T00:00:00')
@@ -47,6 +122,8 @@ const EventDetail = () => {
     const hr12 = hr % 12 || 12
     return `${hr12}:${m} ${ampm}`
   }
+
+  const canRegister = user && user.role === 'user'
 
   if (loading) {
     return (
@@ -85,6 +162,9 @@ const EventDetail = () => {
           <nav className="hidden md:flex items-center gap-lg">
             <a className="text-on-surface-variant hover:text-primary transition-colors font-label-md" href="/user/dashboard">Dashboard</a>
             <a className="text-on-surface-variant hover:text-primary transition-colors font-label-md" href="/events">Events</a>
+            {canRegister && (
+              <a className="text-on-surface-variant hover:text-primary transition-colors font-label-md" href="/user/registrations">My Registrations</a>
+            )}
           </nav>
         </div>
       </header>
@@ -99,6 +179,28 @@ const EventDetail = () => {
           Back to Events
         </Link>
 
+        {/* Notification Banner */}
+        {notification && (
+          <div
+            className={`mb-xl px-lg py-md rounded-xl flex items-center gap-sm font-label-md transition-all ${
+              notification.type === 'success'
+                ? 'bg-green-50 border border-green-200 text-green-700'
+                : 'bg-red-50 border border-red-200 text-red-700'
+            }`}
+          >
+            <span className="material-symbols-outlined text-[20px]">
+              {notification.type === 'success' ? 'check_circle' : 'error'}
+            </span>
+            {notification.text}
+            <button
+              onClick={() => setNotification(null)}
+              className="ml-auto material-symbols-outlined text-[18px] opacity-60 hover:opacity-100"
+            >
+              close
+            </button>
+          </div>
+        )}
+
         {/* Hero Banner */}
         <div className="rounded-2xl bg-gradient-to-br from-primary-container via-primary to-inverse-surface p-2xl mb-xl relative overflow-hidden">
           <div className="absolute -right-16 -top-16 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
@@ -112,6 +214,69 @@ const EventDetail = () => {
             <p className="text-body-lg text-white/80 max-w-2xl">{event.description}</p>
           </div>
         </div>
+
+        {/* Registration Action Card — only for 'user' role */}
+        {canRegister && (
+          <div className="bg-surface-container-lowest rounded-xl border border-outline-variant p-lg mb-xl">
+            <div className="flex items-center justify-between flex-wrap gap-md">
+              <div className="flex items-center gap-sm">
+                <span className="material-symbols-outlined text-primary">
+                  {isRegistered ? 'how_to_reg' : 'person_add'}
+                </span>
+                <div>
+                  <h3 className="font-headline-sm text-headline-sm text-on-surface">
+                    {isRegistered ? 'You are registered' : 'Ready to attend?'}
+                  </h3>
+                  <p className="text-body-sm text-on-surface-variant">
+                    {isRegistered
+                      ? 'You have a spot reserved for this event.'
+                      : 'Register now to secure your spot.'}
+                  </p>
+                </div>
+              </div>
+
+              {checkingRegistration ? (
+                <span className="text-body-sm text-on-surface-variant">Checking status...</span>
+              ) : isRegistered ? (
+                <button
+                  onClick={handleCancel}
+                  disabled={registering}
+                  className="px-xl py-sm bg-red-50 text-red-600 border border-red-200 rounded-lg font-label-md hover:bg-red-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-sm"
+                >
+                  {registering ? (
+                    <>
+                      <span className="material-symbols-outlined animate-spin text-[18px]">sync</span>
+                      Cancelling...
+                    </>
+                  ) : (
+                    <>
+                      <span className="material-symbols-outlined text-[18px]">cancel</span>
+                      Cancel Registration
+                    </>
+                  )}
+                </button>
+              ) : (
+                <button
+                  onClick={handleRegister}
+                  disabled={registering}
+                  className="px-xl py-sm bg-primary text-on-primary rounded-lg font-label-md hover:bg-primary-container transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-sm shadow-md"
+                >
+                  {registering ? (
+                    <>
+                      <span className="material-symbols-outlined animate-spin text-[18px]">sync</span>
+                      Registering...
+                    </>
+                  ) : (
+                    <>
+                      <span className="material-symbols-outlined text-[18px]">app_registration</span>
+                      Register
+                    </>
+                  )}
+                </button>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Info Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-lg mb-xl">

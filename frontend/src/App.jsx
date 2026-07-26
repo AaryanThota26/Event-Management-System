@@ -6,6 +6,7 @@ import Signup from './pages/Signup'
 import Dashboard from './pages/Dashboard'
 import Events from './pages/Events'
 import EventDetail from './pages/EventDetail'
+import MyRegistrations from './pages/MyRegistrations'
 import './App.css'
 
 function ProtectedRoute({ children }) {
@@ -65,6 +66,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <EventDetail />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/user/registrations"
+              element={
+                <ProtectedRoute>
+                  <MyRegistrations />
                 </ProtectedRoute>
               }
             />
