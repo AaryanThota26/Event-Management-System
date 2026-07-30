@@ -52,9 +52,12 @@ export function AuthProvider({ children }) {
 
       return { success: true, user: userData }
     } catch (error) {
-      const message =
-        error.response?.data?.detail || 'Invalid email or password'
-      return { success: false, message }
+      if (error.response?.status === 401) {
+        // Invalid credentials — use a fixed user-facing message, never expose backend detail
+        return { success: false, message: 'Invalid email or password.' }
+      }
+      // Network / server errors
+      return { success: false, message: 'Unable to connect to the server. Please try again.' }
     } finally {
       setLoading(false)
     }

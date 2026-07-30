@@ -109,7 +109,7 @@ def update_event(
     event_id: int,
     event_data: EventUpdate,
     db: Annotated[Session, Depends(get_db)],
-    user: Annotated[User, Depends(get_current_user)],
+    user: Annotated[User, Depends(require_role(UserRole.ORGANIZER, UserRole.ADMIN))],
 ):
     return svc.update_event(db, event_id, event_data.model_dump(exclude_unset=True), user)
 
@@ -127,7 +127,7 @@ def update_event(
 def delete_event(
     event_id: int,
     db: Annotated[Session, Depends(get_db)],
-    user: Annotated[User, Depends(get_current_user)],
+    user: Annotated[User, Depends(require_role(UserRole.ORGANIZER, UserRole.ADMIN))],
 ):
     svc.delete_event(db, event_id, user)
     return MessageResponse(message=f"Event {event_id} deleted successfully")

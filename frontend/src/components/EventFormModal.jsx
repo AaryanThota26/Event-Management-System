@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 const initialFormState = {
   title: '',
@@ -27,6 +27,31 @@ const EventFormModal = ({ event, onClose, onSubmit, submitting }) => {
   })
 
   const [errors, setErrors] = useState({})
+
+  // Focus trap: focus first input on mount
+  const firstInputRef = useRef(null)
+  const modalRef = useRef(null)
+
+  useEffect(() => {
+    // Focus the first input when modal opens
+    if (firstInputRef.current) {
+      firstInputRef.current.focus()
+    }
+    // Lock body scroll
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [])
+
+  // Close on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && !submitting) onClose()
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [onClose, submitting])
 
   const validate = () => {
     const errs = {}
@@ -67,141 +92,189 @@ const EventFormModal = ({ event, onClose, onSubmit, submitting }) => {
       errors[field] ? 'border-error' : 'border-outline-variant'
     }`
 
+  const modalTitleId = isEditing ? 'edit-event-title' : 'create-event-title'
+
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-md bg-black/40 backdrop-blur-sm">
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center p-md bg-black/40 backdrop-blur-sm"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby={modalTitleId}
+      ref={modalRef}
+    >
       <div className="bg-surface rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between px-xl pt-xl pb-md border-b border-outline-variant">
-          <h2 className="font-headline-md text-headline-md text-on-surface">
+          <h2 id={modalTitleId} className="font-headline-md text-headline-md text-on-surface">
             {isEditing ? 'Edit Event' : 'Create New Event'}
           </h2>
           <button
             onClick={onClose}
+            disabled={submitting}
             className="material-symbols-outlined p-sm rounded-full hover:bg-surface-container transition-colors text-on-surface-variant"
+            aria-label="Close modal"
           >
             close
           </button>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="px-xl py-lg space-y-lg">
+        <form onSubmit={handleSubmit} className="px-xl py-lg space-y-lg" noValidate>
           {/* Title */}
           <div>
-            <label className="block font-label-md text-label-md text-on-surface mb-xs">
-              Title
+            <label className="block font-label-md text-label-md text-on-surface mb-xs" htmlFor="event-title">
+              Title <span className="text-error" aria-hidden="true">*</span>
             </label>
             <input
+              ref={firstInputRef}
+              id="event-title"
               className={inputClass('title')}
               placeholder="Event title"
               type="text"
               value={form.title}
               onChange={handleChange('title')}
+              aria-invalid={errors.title ? 'true' : undefined}
+              aria-describedby={errors.title ? 'event-title-error' : undefined}
             />
             {errors.title && (
-              <p className="text-body-sm text-error mt-xs">{errors.title}</p>
+              <p id="event-title-error" className="text-body-sm text-error mt-xs flex items-center gap-xs" role="alert">
+                <span className="material-symbols-outlined text-[14px]" aria-hidden="true">error</span>
+                {errors.title}
+              </p>
             )}
           </div>
 
           {/* Description */}
           <div>
-            <label className="block font-label-md text-label-md text-on-surface mb-xs">
-              Description
+            <label className="block font-label-md text-label-md text-on-surface mb-xs" htmlFor="event-description">
+              Description <span className="text-error" aria-hidden="true">*</span>
             </label>
             <textarea
+              id="event-description"
               className={`${inputClass('description')} min-h-[100px] resize-y`}
               placeholder="Detailed description of the event"
               value={form.description}
               onChange={handleChange('description')}
+              aria-invalid={errors.description ? 'true' : undefined}
+              aria-describedby={errors.description ? 'event-description-error' : undefined}
             />
             {errors.description && (
-              <p className="text-body-sm text-error mt-xs">{errors.description}</p>
+              <p id="event-description-error" className="text-body-sm text-error mt-xs flex items-center gap-xs" role="alert">
+                <span className="material-symbols-outlined text-[14px]" aria-hidden="true">error</span>
+                {errors.description}
+              </p>
             )}
           </div>
 
           {/* Date & Time */}
-          <div className="grid grid-cols-2 gap-md">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-md">
             <div>
-              <label className="block font-label-md text-label-md text-on-surface mb-xs">
-                Date
+              <label className="block font-label-md text-label-md text-on-surface mb-xs" htmlFor="event-date">
+                Date <span className="text-error" aria-hidden="true">*</span>
               </label>
               <input
+                id="event-date"
                 className={inputClass('date')}
                 type="date"
                 value={form.date}
                 onChange={handleChange('date')}
+                aria-invalid={errors.date ? 'true' : undefined}
+                aria-describedby={errors.date ? 'event-date-error' : undefined}
               />
               {errors.date && (
-                <p className="text-body-sm text-error mt-xs">{errors.date}</p>
+                <p id="event-date-error" className="text-body-sm text-error mt-xs flex items-center gap-xs" role="alert">
+                  <span className="material-symbols-outlined text-[14px]" aria-hidden="true">error</span>
+                  {errors.date}
+                </p>
               )}
             </div>
             <div>
-              <label className="block font-label-md text-label-md text-on-surface mb-xs">
-                Time
+              <label className="block font-label-md text-label-md text-on-surface mb-xs" htmlFor="event-time">
+                Time <span className="text-error" aria-hidden="true">*</span>
               </label>
               <input
+                id="event-time"
                 className={inputClass('time')}
                 type="time"
                 value={form.time}
                 onChange={handleChange('time')}
+                aria-invalid={errors.time ? 'true' : undefined}
+                aria-describedby={errors.time ? 'event-time-error' : undefined}
               />
               {errors.time && (
-                <p className="text-body-sm text-error mt-xs">{errors.time}</p>
+                <p id="event-time-error" className="text-body-sm text-error mt-xs flex items-center gap-xs" role="alert">
+                  <span className="material-symbols-outlined text-[14px]" aria-hidden="true">error</span>
+                  {errors.time}
+                </p>
               )}
             </div>
           </div>
 
           {/* Location */}
           <div>
-            <label className="block font-label-md text-label-md text-on-surface mb-xs">
-              Location
+            <label className="block font-label-md text-label-md text-on-surface mb-xs" htmlFor="event-location">
+              Location <span className="text-error" aria-hidden="true">*</span>
             </label>
             <input
+              id="event-location"
               className={inputClass('location')}
               placeholder="Venue or online link"
               type="text"
               value={form.location}
               onChange={handleChange('location')}
+              aria-invalid={errors.location ? 'true' : undefined}
+              aria-describedby={errors.location ? 'event-location-error' : undefined}
             />
             {errors.location && (
-              <p className="text-body-sm text-error mt-xs">{errors.location}</p>
+              <p id="event-location-error" className="text-body-sm text-error mt-xs flex items-center gap-xs" role="alert">
+                <span className="material-symbols-outlined text-[14px]" aria-hidden="true">error</span>
+                {errors.location}
+              </p>
             )}
           </div>
 
           {/* Capacity */}
           <div>
-            <label className="block font-label-md text-label-md text-on-surface mb-xs">
-              Capacity
+            <label className="block font-label-md text-label-md text-on-surface mb-xs" htmlFor="event-capacity">
+              Capacity <span className="text-error" aria-hidden="true">*</span>
             </label>
             <input
+              id="event-capacity"
               className={inputClass('capacity')}
               placeholder="Maximum attendees"
               type="number"
               min="1"
               value={form.capacity}
               onChange={handleChange('capacity')}
+              aria-invalid={errors.capacity ? 'true' : undefined}
+              aria-describedby={errors.capacity ? 'event-capacity-error' : undefined}
             />
             {errors.capacity && (
-              <p className="text-body-sm text-error mt-xs">{errors.capacity}</p>
+              <p id="event-capacity-error" className="text-body-sm text-error mt-xs flex items-center gap-xs" role="alert">
+                <span className="material-symbols-outlined text-[14px]" aria-hidden="true">error</span>
+                {errors.capacity}
+              </p>
             )}
           </div>
 
           {/* Actions */}
-          <div className="flex items-center justify-end gap-md pt-md border-t border-outline-variant">
+          <div className="flex flex-col-reverse sm:flex-row items-center justify-end gap-md pt-md border-t border-outline-variant">
             <button
               type="button"
               onClick={onClose}
-              className="px-xl py-sm border border-outline-variant rounded-lg font-label-md text-on-surface hover:bg-surface-container transition-colors"
+              className="w-full sm:w-auto px-xl py-sm border border-outline-variant rounded-lg font-label-md text-on-surface hover:bg-surface-container transition-colors"
               disabled={submitting}
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-xl py-sm bg-primary text-on-primary rounded-lg font-label-md hover:bg-primary-container transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-sm"
+              className="w-full sm:w-auto px-xl py-sm bg-primary text-on-primary rounded-lg font-label-md hover:bg-primary-container transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-sm"
               disabled={submitting}
+              aria-busy={submitting}
             >
               {submitting && (
-                <span className="material-symbols-outlined animate-spin text-[18px]">sync</span>
+                <span className="material-symbols-outlined animate-spin text-[18px]" aria-hidden="true">sync</span>
               )}
               {isEditing ? 'Save Changes' : 'Create Event'}
             </button>

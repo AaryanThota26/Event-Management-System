@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import EventProLogo from '../components/EventProLogo'
 import SocialButton from '../components/SocialButton'
@@ -25,19 +25,22 @@ const Login = () => {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [submitState, setSubmitState] = useState('idle')
+  const [fieldErrors, setFieldErrors] = useState({})
+
+  const validate = () => {
+    const errs = {}
+    if (!email.trim()) errs.email = 'Email is required'
+    if (!password) errs.password = 'Password is required'
+    setFieldErrors(errs)
+    return Object.keys(errs).length === 0
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
+    setFieldErrors({})
 
-    if (!email.trim()) {
-      setError('Email is required')
-      return
-    }
-    if (!password) {
-      setError('Password is required')
-      return
-    }
+    if (!validate()) return
 
     setSubmitState('loading')
 
@@ -51,6 +54,7 @@ const Login = () => {
       }, 800)
     } else {
       setSubmitState('idle')
+      setPassword('')
       setError(result.message)
     }
   }
@@ -59,7 +63,7 @@ const Login = () => {
     if (submitState === 'loading') {
       return (
         <>
-          <span className="material-symbols-outlined animate-spin">sync</span>
+          <span className="material-symbols-outlined animate-spin" aria-hidden="true">sync</span>
           <span>Authenticating...</span>
         </>
       )
@@ -67,7 +71,7 @@ const Login = () => {
     if (submitState === 'success') {
       return (
         <>
-          <span className="material-symbols-outlined">check_circle</span>
+          <span className="material-symbols-outlined" aria-hidden="true">check_circle</span>
           <span>Success</span>
         </>
       )
@@ -75,7 +79,7 @@ const Login = () => {
     return (
       <>
         <span>Sign in to Dashboard</span>
-        <span className="material-symbols-outlined text-[18px] group-hover:translate-x-1 transition-transform">
+        <span className="material-symbols-outlined text-[18px] group-hover:translate-x-1 transition-transform" aria-hidden="true">
           arrow_forward
         </span>
       </>
@@ -83,15 +87,20 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col justify-center items-center p-md glass-background">
+    <div className="min-h-screen flex flex-col justify-center items-center p-md sm:p-lg glass-background">
+      {/* Skip to content link */}
+      <a href="#login-form" className="skip-to-main">
+        Skip to login form
+      </a>
+
       {/* Header Logo */}
       <header className="absolute top-0 left-0 w-full p-lg flex justify-center lg:justify-start">
         <EventProLogo />
       </header>
 
-      <main className="w-full max-w-[480px] z-10">
+      <main className="w-full max-w-[480px] z-10" id="main-content">
         {/* Login Card */}
-        <div className="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm p-xl lg:p-2xl">
+        <div className="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm p-xl sm:p-2xl">
           {/* Heading */}
           <div className="mb-xl text-center">
             <h1 className="font-headline-lg text-headline-lg text-on-surface mb-xs">
@@ -109,7 +118,7 @@ const Login = () => {
           </div>
 
           {/* Divider */}
-          <div className="relative mb-xl">
+          <div className="relative mb-xl" role="separator" aria-orientation="horizontal">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-outline-variant"></div>
             </div>
@@ -120,15 +129,25 @@ const Login = () => {
             </div>
           </div>
 
-          {/* Error Message */}
+          {/* General Error Message */}
           {error && (
-            <div className="mb-lg px-md py-sm rounded-lg bg-error-container text-on-error-container font-body-sm text-body-sm">
+            <div
+              className="mb-lg px-md py-sm rounded-lg bg-error-container text-on-error-container font-body-sm text-body-sm flex items-center gap-sm"
+              role="alert"
+            >
+              <span className="material-symbols-outlined text-[18px]" aria-hidden="true">error</span>
               {error}
             </div>
           )}
 
           {/* Login Form */}
-          <form className="space-y-lg" onSubmit={handleSubmit}>
+          <form
+            id="login-form"
+            className="space-y-lg"
+            onSubmit={handleSubmit}
+            noValidate
+            aria-label="Login form"
+          >
             <FormInput
               id="email"
               label="Email Address"
@@ -137,7 +156,12 @@ const Login = () => {
               placeholder="name@company.com"
               required
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+                setEmail(e.target.value)
+                if (fieldErrors.email) setFieldErrors((prev) => ({ ...prev, email: '' }))
+              }}
+              error={fieldErrors.email}
+              autoComplete="email"
             />
 
             <FormInput
@@ -148,11 +172,17 @@ const Login = () => {
               placeholder="••••••••"
               required
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => {
+                setPassword(e.target.value)
+                if (fieldErrors.password) setFieldErrors((prev) => ({ ...prev, password: '' }))
+              }}
+              error={fieldErrors.password}
+              autoComplete="current-password"
               rightElement={
                 <a
                   className="font-label-sm text-label-sm text-primary hover:underline"
                   href="#"
+                  tabIndex={-1}
                 >
                   Forgot password?
                 </a>
@@ -162,7 +192,7 @@ const Login = () => {
             {/* Remember me */}
             <div className="flex items-center gap-sm">
               <input
-                className="w-4 h-4 text-primary border-outline-variant rounded focus:ring-primary"
+                className="w-4 h-4 text-primary border-outline-variant rounded focus:ring-primary accent-primary"
                 id="remember"
                 type="checkbox"
               />
@@ -180,9 +210,10 @@ const Login = () => {
                 submitState === 'success'
                   ? 'bg-green-600 text-on-primary'
                   : 'bg-primary text-on-primary hover:bg-primary-container hover:shadow-md'
-              } ${submitState === 'loading' ? 'opacity-80' : ''}`}
+              } ${submitState === 'loading' ? 'opacity-80 cursor-wait' : ''}`}
               type="submit"
-              disabled={submitState === 'loading'}
+              disabled={submitState === 'loading' || submitState === 'success'}
+              aria-busy={submitState === 'loading'}
             >
               {getButtonContent()}
             </button>
@@ -191,13 +222,13 @@ const Login = () => {
           {/* Sign Up Link */}
           <div className="mt-xl text-center">
             <p className="font-body-sm text-body-sm text-on-surface-variant">
-              Don't have an account?{' '}
-              <a
+              Don&apos;t have an account?{' '}
+              <Link
                 className="text-primary font-label-md text-label-md hover:underline"
-                href="/signup"
+                to="/signup"
               >
                 Create an account
-              </a>
+              </Link>
             </p>
           </div>
         </div>
@@ -217,7 +248,7 @@ const Login = () => {
       </main>
 
       {/* Decorative Background Element */}
-      <div className="fixed bottom-0 right-0 w-1/3 h-1/3 -z-10 opacity-20 pointer-events-none">
+      <div className="fixed bottom-0 right-0 w-1/3 h-1/3 -z-10 opacity-20 pointer-events-none" aria-hidden="true">
         <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-primary rounded-full blur-[120px]"></div>
       </div>
     </div>

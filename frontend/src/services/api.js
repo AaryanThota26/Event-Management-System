@@ -24,13 +24,17 @@ api.interceptors.request.use(
 )
 
 // Response interceptor — handle 401 by clearing auth and redirecting
+// Skip redirect for auth endpoints (login/register) so the login page can show inline errors
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('eventpro_token')
-      localStorage.removeItem('eventpro_user')
-      window.location.href = '/login'
+      const isAuthRequest = error.config?.url?.includes('/api/auth/')
+      if (!isAuthRequest) {
+        localStorage.removeItem('eventpro_token')
+        localStorage.removeItem('eventpro_user')
+        window.location.href = '/login'
+      }
     }
     return Promise.reject(error)
   }

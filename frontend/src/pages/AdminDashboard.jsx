@@ -3,8 +3,6 @@ import { Link } from 'react-router-dom'
 import api from '../services/api'
 import { useAuth } from '../hooks/useAuth'
 import EventProLogo from '../components/EventProLogo'
-import EventFormModal from '../components/EventFormModal'
-import ParticipantsModal from '../components/ParticipantsModal'
 import SkeletonLoader from '../components/SkeletonLoader'
 import LogoutConfirmModal from '../components/LogoutConfirmModal'
 
@@ -20,27 +18,25 @@ const roleLabel = {
   user: 'User',
 }
 
-const OrganizerDashboard = () => {
+const FILTERS = [
+  { key: 'all', label: 'All Events' },
+  { key: 'pending', label: 'Pending' },
+  { key: 'approved', label: 'Approved' },
+  { key: 'rejected', label: 'Rejected' },
+]
+
+const AdminDashboard = () => {
   const { user, logout } = useAuth()
 
-  // Events state
   const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-
-  // Notification state
   const [notification, setNotification] = useState(null)
+  const [statusFilter, setStatusFilter] = useState('all')
 
-  // Modal state
-  const [showCreateModal, setShowCreateModal] = useState(false)
-  const [editingEvent, setEditingEvent] = useState(null)
-  const [participantsModal, setParticipantsModal] = useState(null)
-  const [deletingEventId, setDeletingEventId] = useState(null)
-  const [deleting, setDeleting] = useState(false)
+  // Track which event ids have a pending action
+  const [actioning, setActioning] = useState({})
   const [showLogoutModal, setShowLogoutModal] = useState(false)
-
-  // Form submission state
-  const [submitting, setSubmitting] = useState(false)
 
   // Auto-dismiss notification
   useEffect(() => {
@@ -49,7 +45,7 @@ const OrganizerDashboard = () => {
     return () => clearTimeout(timer)
   }, [notification])
 
-  // Fetch events
+  // Fetch all events
   const fetchEvents = async () => {
     setLoading(true)
     setError('')
@@ -67,59 +63,52 @@ const OrganizerDashboard = () => {
     fetchEvents()
   }, [])
 
-  // Create event handler
-  const handleCreate = async (formData) => {
-    setSubmitting(true)
+  // Approve event — immediate state update, no refetch
+  const handleApprove = async (eventId) => {
+    setActioning((prev) => ({ ...prev, [eventId]: 'approve' }))
+    setNotification(null)
     try {
-      await api.post('/api/events', formData)
-      setShowCreateModal(false)
-      setNotification({ type: 'success', text: 'Event created successfully! It is now pending approval.' })
-      fetchEvents()
+      const { data } = await api.patch(`/api/events/${eventId}/approve`)
+      // Optimistic update: replace the event in-place
+      setEvents((prev) =>
+        prev.map((e) => (e.id === eventId ? { ...e, status: data.status } : e))
+      )
+      setNotification({ type: 'success', text: 'Event approved successfully.' })
     } catch (err) {
       setNotification({
         type: 'error',
-        text: err.response?.data?.detail || 'Failed to create event.',
+        text: err.response?.data?.detail || 'Failed to approve event.',
       })
     } finally {
-      setSubmitting(false)
+      setActioning((prev) => {
+        const next = { ...prev }
+        delete next[eventId]
+        return next
+      })
     }
   }
 
-  // Edit event handler
-  const handleEdit = async (formData) => {
-    if (!editingEvent) return
-    setSubmitting(true)
+  // Reject event — immediate state update, no refetch
+  const handleReject = async (eventId) => {
+    setActioning((prev) => ({ ...prev, [eventId]: 'reject' }))
+    setNotification(null)
     try {
-      await api.put(`/api/events/${editingEvent.id}`, formData)
-      setEditingEvent(null)
-      setNotification({ type: 'success', text: 'Event updated successfully!' })
-      fetchEvents()
+      const { data } = await api.patch(`/api/events/${eventId}/reject`)
+      setEvents((prev) =>
+        prev.map((e) => (e.id === eventId ? { ...e, status: data.status } : e))
+      )
+      setNotification({ type: 'success', text: 'Event rejected.' })
     } catch (err) {
       setNotification({
         type: 'error',
-        text: err.response?.data?.detail || 'Failed to update event.',
+        text: err.response?.data?.detail || 'Failed to reject event.',
       })
     } finally {
-      setSubmitting(false)
-    }
-  }
-
-  // Delete event handler
-  const handleDelete = async () => {
-    if (!deletingEventId) return
-    setDeleting(true)
-    try {
-      await api.delete(`/api/events/${deletingEventId}`)
-      setDeletingEventId(null)
-      setNotification({ type: 'success', text: 'Event deleted successfully.' })
-      fetchEvents()
-    } catch (err) {
-      setNotification({
-        type: 'error',
-        text: err.response?.data?.detail || 'Failed to delete event.',
+      setActioning((prev) => {
+        const next = { ...prev }
+        delete next[eventId]
+        return next
       })
-    } finally {
-      setDeleting(false)
     }
   }
 
@@ -142,27 +131,29 @@ const OrganizerDashboard = () => {
     return `${hr12}:${m} ${ampm}`
   }
 
-  const getStats = () => {
-    const total = events.length
-    const approved = events.filter((e) => e.status === 'approved').length
-    const pending = events.filter((e) => e.status === 'pending').length
-    const rejected = events.filter((e) => e.status === 'rejected').length
-    return { total, approved, pending, rejected }
-  }
+  const filtered =
+    statusFilter === 'all'
+      ? events
+      : events.filter((e) => e.status === statusFilter)
 
-  const stats = getStats()
+  const stats = {
+    total: events.length,
+    approved: events.filter((e) => e.status === 'approved').length,
+    pending: events.filter((e) => e.status === 'pending').length,
+    rejected: events.filter((e) => e.status === 'rejected').length,
+  }
 
   return (
     <div className="min-h-screen bg-surface-bright">
       {/* Skip to main */}
-      <a href="#organizer-main" className="skip-to-main">
-        Skip to organizer dashboard
+      <a href="#admin-main" className="skip-to-main">
+        Skip to admin dashboard
       </a>
 
       {/* Top Nav */}
       <header className="w-full p-lg border-b border-outline-variant bg-surface-container-lowest">
         <div className="max-w-[1440px] mx-auto flex items-center justify-between">
-          <Link to="/organizer/dashboard"><EventProLogo /></Link>
+          <Link to="/admin/dashboard"><EventProLogo /></Link>
           <div className="flex items-center gap-md">
             <span className="font-body-sm text-body-sm text-on-surface-variant hidden sm:inline">
               {user?.full_name}
@@ -182,24 +173,15 @@ const OrganizerDashboard = () => {
       </header>
 
       {/* Main Content */}
-      <main id="organizer-main" className="max-w-[1440px] mx-auto p-lg sm:p-xl">
+      <main id="admin-main" className="max-w-[1440px] mx-auto p-lg sm:p-xl">
         {/* Page Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2xl gap-md">
-          <div>
-            <h1 className="font-headline-lg text-headline-lg text-on-surface mb-xs">
-              Welcome, {user?.full_name || 'Organizer'}
-            </h1>
-            <p className="text-body-md text-on-surface-variant">
-              You are logged in as <strong className="text-primary">Organizer</strong>.
-            </p>
-          </div>
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="w-full sm:w-auto px-xl py-md bg-primary text-on-primary rounded-lg font-label-md hover:bg-primary-container transition-colors shadow-md flex items-center justify-center gap-sm shrink-0"
-          >
-            <span className="material-symbols-outlined text-[20px]" aria-hidden="true">add</span>
-            Create Event
-          </button>
+        <div className="mb-2xl">
+          <h1 className="font-headline-lg text-headline-lg text-on-surface mb-xs">
+            Welcome, {user?.full_name || 'Admin'}
+          </h1>
+          <p className="text-body-md text-on-surface-variant">
+            You are logged in as <strong className="text-primary">Admin</strong>.
+          </p>
         </div>
 
         {/* Notification Banner */}
@@ -250,6 +232,24 @@ const OrganizerDashboard = () => {
           </div>
         )}
 
+        {/* Filter Tabs */}
+        <div className="flex flex-wrap items-center gap-sm mb-xl" role="group" aria-label="Status filters">
+          {FILTERS.map((f) => (
+            <button
+              key={f.key}
+              onClick={() => setStatusFilter(f.key)}
+              className={
+                statusFilter === f.key
+                  ? 'px-lg py-sm bg-primary text-on-primary rounded-full font-label-md shadow-md border border-transparent transition-all'
+                  : 'px-lg py-sm bg-surface-container-lowest text-on-surface-variant border border-outline-variant rounded-full font-label-md hover:bg-surface-container-high transition-all'
+              }
+              aria-pressed={statusFilter === f.key}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+
         {/* Content Area — stable min-height prevents layout shift */}
         <div className="min-h-[400px]">
           {/* Loading State */}
@@ -270,27 +270,30 @@ const OrganizerDashboard = () => {
           )}
 
           {/* Empty State */}
-          {!loading && !error && events.length === 0 && (
+          {!loading && !error && filtered.length === 0 && (
             <div className="flex flex-col items-center justify-center min-h-[400px]">
-              <span className="material-symbols-outlined text-6xl text-outline-variant mb-md" aria-hidden="true">event_busy</span>
-              <p className="font-headline-sm text-headline-sm text-on-surface mb-xs">No events yet</p>
-              <p className="text-body-sm text-on-surface-variant mb-lg">
-                Create your first event to get started.
+              <span className="material-symbols-outlined text-6xl text-outline-variant mb-md" aria-hidden="true">
+                {events.length === 0 ? 'event_busy' : 'filter_alt_off'}
+              </span>
+              <p className="font-headline-sm text-headline-sm text-on-surface mb-xs">
+                {events.length === 0 ? 'No events in the system' : 'No events match this filter'}
               </p>
-              <button
-                onClick={() => setShowCreateModal(true)}
-                className="px-xl py-md bg-primary text-on-primary rounded-lg font-label-md hover:bg-primary-container transition-colors shadow-md"
-              >
-                Create Event
-              </button>
+              <p className="text-body-sm text-on-surface-variant text-center max-w-md">
+                {events.length === 0
+                  ? 'Events will appear here once organizers create them.'
+                  : 'Try selecting a different filter tab above.'}
+              </p>
             </div>
           )}
 
           {/* Events List */}
-          {!loading && !error && events.length > 0 && (
+          {!loading && !error && filtered.length > 0 && (
           <div className="space-y-md">
-            {events.map((event) => {
+            {filtered.map((event) => {
               const status = STATUS_STYLES[event.status] || STATUS_STYLES.pending
+              const isPending = event.status === 'pending'
+              const busyWith = actioning[event.id]
+
               return (
                 <div
                   key={event.id}
@@ -327,33 +330,46 @@ const OrganizerDashboard = () => {
                       </div>
                     </div>
 
-                    {/* Actions */}
-                    <div className="flex items-center gap-sm shrink-0">
-                      <button
-                        onClick={() => setParticipantsModal({ id: event.id, title: event.title })}
-                        className="px-md py-sm border border-outline-variant rounded-lg font-label-md text-label-md text-on-surface hover:bg-surface-container transition-colors flex items-center gap-xs"
-                        aria-label={`View participants for ${event.title}`}
-                      >
-                        <span className="material-symbols-outlined text-[18px]" aria-hidden="true">group</span>
-                        <span className="hidden sm:inline">Participants</span>
-                      </button>
-                      <button
-                        onClick={() => setEditingEvent(event)}
-                        className="px-md py-sm border border-primary/30 text-primary rounded-lg font-label-md text-label-md hover:bg-primary-fixed transition-colors flex items-center gap-xs"
-                        aria-label={`Edit ${event.title}`}
-                      >
-                        <span className="material-symbols-outlined text-[18px]" aria-hidden="true">edit</span>
-                        <span className="hidden sm:inline">Edit</span>
-                      </button>
-                      <button
-                        onClick={() => setDeletingEventId(event.id)}
-                        className="px-md py-sm border border-error/30 text-error rounded-lg font-label-md text-label-md hover:bg-error-container/20 transition-colors flex items-center gap-xs"
-                        aria-label={`Delete ${event.title}`}
-                      >
-                        <span className="material-symbols-outlined text-[18px]" aria-hidden="true">delete</span>
-                        <span className="hidden sm:inline">Delete</span>
-                      </button>
-                    </div>
+                    {/* Approve / Reject Actions — only for pending events */}
+                    {isPending && (
+                      <div className="flex items-center gap-sm shrink-0">
+                        <button
+                          onClick={() => handleApprove(event.id)}
+                          disabled={!!busyWith}
+                          className="flex-1 sm:flex-none px-md py-sm bg-green-600 text-white rounded-lg font-label-md text-label-md hover:bg-green-700 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-xs"
+                          aria-label={`Approve ${event.title}`}
+                        >
+                          {busyWith === 'approve' ? (
+                            <span className="material-symbols-outlined animate-spin text-[18px]" aria-hidden="true">sync</span>
+                          ) : (
+                            <span className="material-symbols-outlined text-[18px]" aria-hidden="true">check</span>
+                          )}
+                          <span className="hidden sm:inline">Approve</span>
+                        </button>
+                        <button
+                          onClick={() => handleReject(event.id)}
+                          disabled={!!busyWith}
+                          className="flex-1 sm:flex-none px-md py-sm border border-error/30 text-error rounded-lg font-label-md text-label-md hover:bg-error-container/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-xs"
+                          aria-label={`Reject ${event.title}`}
+                        >
+                          {busyWith === 'reject' ? (
+                            <span className="material-symbols-outlined animate-spin text-[18px]" aria-hidden="true">sync</span>
+                          ) : (
+                            <span className="material-symbols-outlined text-[18px]" aria-hidden="true">close</span>
+                          )}
+                          <span className="hidden sm:inline">Reject</span>
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Non-pending events: show a small status indicator instead of actions */}
+                    {!isPending && (
+                      <div className="shrink-0">
+                        <span className={`inline-block px-md py-sm rounded-lg text-label-md font-bold ${status.bg} ${status.text}`}>
+                          {status.label}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
               )
@@ -362,82 +378,13 @@ const OrganizerDashboard = () => {
             {/* Total count */}
             <div className="text-center pt-md">
               <p className="text-body-sm text-on-surface-variant">
-                Showing {events.length} event{events.length !== 1 ? 's' : ''}
+                Showing {filtered.length} of {events.length} event{events.length !== 1 ? 's' : ''}
               </p>
             </div>
           </div>
         )}
         </div>
       </main>
-
-      {/* Create Event Modal */}
-      {showCreateModal && (
-        <EventFormModal
-          onClose={() => setShowCreateModal(false)}
-          onSubmit={handleCreate}
-          submitting={submitting}
-        />
-      )}
-
-      {/* Edit Event Modal */}
-      {editingEvent && (
-        <EventFormModal
-          event={editingEvent}
-          onClose={() => setEditingEvent(null)}
-          onSubmit={handleEdit}
-          submitting={submitting}
-        />
-      )}
-
-      {/* Participants Modal */}
-      {participantsModal && (
-        <ParticipantsModal
-          eventId={participantsModal.id}
-          eventTitle={participantsModal.title}
-          onClose={() => setParticipantsModal(null)}
-        />
-      )}
-
-      {/* Delete Confirmation Dialog */}
-      {deletingEventId && (
-        <div
-          className="fixed inset-0 z-[100] flex items-center justify-center p-md bg-black/40 backdrop-blur-sm"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="delete-dialog-title"
-        >
-          <div className="bg-surface rounded-2xl shadow-xl w-full max-w-sm p-xl">
-            <div className="flex items-center gap-sm mb-lg">
-              <span className="material-symbols-outlined text-3xl text-error" aria-hidden="true">warning</span>
-              <h2 id="delete-dialog-title" className="font-headline-md text-headline-md text-on-surface">
-                Delete Event
-              </h2>
-            </div>
-            <p className="text-body-md text-on-surface-variant mb-lg">
-              Are you sure you want to delete this event? This action cannot be undone.
-            </p>
-            <div className="flex items-center justify-end gap-md">
-              <button
-                onClick={() => setDeletingEventId(null)}
-                className="flex-1 sm:flex-none px-xl py-sm border border-outline-variant rounded-lg font-label-md text-on-surface hover:bg-surface-container transition-colors"
-                disabled={deleting}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleDelete}
-                className="flex-1 sm:flex-none px-xl py-sm bg-error text-on-error rounded-lg font-label-md hover:bg-red-700 transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-sm"
-                disabled={deleting}
-              >
-                {deleting && (
-                  <span className="material-symbols-outlined animate-spin text-[18px]" aria-hidden="true">sync</span>
-                )}
-                Delete
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Logout Confirmation Modal */}
       {showLogoutModal && (
@@ -450,4 +397,4 @@ const OrganizerDashboard = () => {
   )
 }
 
-export default OrganizerDashboard
+export default AdminDashboard
