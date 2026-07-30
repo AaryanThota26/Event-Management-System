@@ -4,6 +4,7 @@ import { useAuth } from './hooks/useAuth'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
 import Dashboard from './pages/Dashboard'
+import OrganizerDashboard from './pages/OrganizerDashboard'
 import Events from './pages/Events'
 import EventDetail from './pages/EventDetail'
 import MyRegistrations from './pages/MyRegistrations'
@@ -89,7 +90,7 @@ function App() {
               path="/organizer/dashboard"
               element={
                 <ProtectedRoute>
-                  <Dashboard />
+                  <OrganizerDashboard />
                 </ProtectedRoute>
               }
             />
