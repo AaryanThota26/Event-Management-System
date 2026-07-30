@@ -10,12 +10,6 @@ const STATUS_STYLES = {
   rejected: { bg: 'bg-red-100', text: 'text-red-700', label: 'Rejected' },
 }
 
-const DASHBOARD_ROUTES = {
-  admin: '/admin/dashboard',
-  organizer: '/organizer/dashboard',
-  user: '/user/dashboard',
-}
-
 const EventDetail = () => {
   const { id } = useParams()
   const { user } = useAuth()
@@ -137,237 +131,219 @@ const EventDetail = () => {
     return <SkeletonLoader type="detail" />
   }
 
-  if (error) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-surface-bright p-md">
-        <span className="material-symbols-outlined text-4xl text-error mb-md" aria-hidden="true">error</span>
-        <p className="text-body-md text-error mb-md text-center">{error}</p>
-        <Link
-          to="/events"
-          className="px-lg py-sm bg-primary text-on-primary rounded-lg font-label-md hover:bg-primary-container transition-colors"
-        >
-          Back to Events
-        </Link>
-      </div>
-    )
-  }
-
   if (!event) return null
 
   const status = STATUS_STYLES[event.status] || STATUS_STYLES.pending
 
   return (
-    <div className="min-h-screen bg-surface-bright">
-      {/* Skip to main */}
-      <a href="#event-detail-main" className="skip-to-main">
-        Skip to event details
-      </a>
-
-      {/* Top Nav */}
-      <header className="sticky top-0 z-50 flex justify-between items-center w-full px-lg py-sm bg-surface border-b border-outline-variant shadow-sm">
-        <div className="flex items-center gap-xl">
-          <span className="font-headline-md text-headline-md font-bold text-primary">EventPro</span>
-          <nav className="hidden md:flex items-center gap-lg" aria-label="Main navigation">
-            <a className="text-on-surface-variant hover:text-primary transition-colors font-label-md" href={DASHBOARD_ROUTES[user?.role] || '/user/dashboard'}>Dashboard</a>
-            <a className="text-on-surface-variant hover:text-primary transition-colors font-label-md" href="/events">Events</a>
-            {canRegister && (
-              <a className="text-on-surface-variant hover:text-primary transition-colors font-label-md" href="/user/registrations">My Registrations</a>
-            )}
-          </nav>
-        </div>
-      </header>
-
-      <main id="event-detail-main" className="max-w-[960px] mx-auto p-lg sm:p-xl">
-        {/* Back link */}
-        <Link
-          to="/events"
-          className="inline-flex items-center gap-xs text-primary font-label-md hover:underline mb-xl"
-        >
-          <span className="material-symbols-outlined text-[20px]" aria-hidden="true">arrow_back</span>
-          Back to Events
-        </Link>
-
-        {/* Notification Banner */}
-        {notification && (
-          <div
-            className={`mb-xl px-lg py-md rounded-xl flex items-center gap-sm font-label-md transition-all ${
-              notification.type === 'success'
-                ? 'bg-green-50 border border-green-200 text-green-700'
-                : 'bg-red-50 border border-red-200 text-red-700'
-            }`}
-            role="alert"
+    <>
+      {/* Error Banner — shown at top if there's an error */}
+      {error && (
+        <div className="flex flex-col items-center justify-center min-h-[300px]" role="alert">
+          <span className="material-symbols-outlined text-4xl text-error mb-md" aria-hidden="true">error</span>
+          <p className="text-body-md text-error mb-md text-center">{error}</p>
+          <Link
+            to="/events"
+            className="px-lg py-sm bg-primary text-on-primary rounded-lg font-label-md hover:bg-primary-container transition-colors"
           >
-            <span className="material-symbols-outlined text-[20px]" aria-hidden="true">
-              {notification.type === 'success' ? 'check_circle' : 'error'}
-            </span>
-            <span className="flex-1">{notification.text}</span>
-            <button
-              onClick={() => setNotification(null)}
-              className="material-symbols-outlined text-[18px] opacity-60 hover:opacity-100"
-              aria-label="Dismiss notification"
-            >
-              close
-            </button>
-          </div>
-        )}
+            Back to Events
+          </Link>
+        </div>
+      )}
 
-        {/* Hero Banner */}
-        <div className="rounded-2xl bg-gradient-to-br from-primary-container via-primary to-inverse-surface p-xl sm:p-2xl mb-xl relative overflow-hidden">
-          <div className="absolute -right-16 -top-16 w-64 h-64 bg-white/10 rounded-full blur-3xl" aria-hidden="true"></div>
-          <div className="relative">
-            <div className="flex items-center gap-sm mb-md">
-              <span className={`px-md py-xs text-label-sm font-bold rounded-lg ${status.bg} ${status.text}`}>
+      {!error && (
+        <>
+          {/* Back link */}
+          <Link
+            to="/events"
+            className="inline-flex items-center gap-xs text-primary font-label-md hover:underline mb-xl"
+          >
+            <span className="material-symbols-outlined text-[20px]" aria-hidden="true">arrow_back</span>
+            Back to Events
+          </Link>
+
+          {/* Notification Banner */}
+          {notification && (
+            <div
+              className={`mb-xl px-lg py-md rounded-xl flex items-center gap-sm font-label-md transition-all ${
+                notification.type === 'success'
+                  ? 'bg-green-50 border border-green-200 text-green-700'
+                  : 'bg-red-50 border border-red-200 text-red-700'
+              }`}
+              role="alert"
+            >
+              <span className="material-symbols-outlined text-[20px]" aria-hidden="true">
+                {notification.type === 'success' ? 'check_circle' : 'error'}
+              </span>
+              <span className="flex-1">{notification.text}</span>
+              <button
+                onClick={() => setNotification(null)}
+                className="material-symbols-outlined text-[18px] opacity-60 hover:opacity-100"
+                aria-label="Dismiss notification"
+              >
+                close
+              </button>
+            </div>
+          )}
+
+          {/* Hero Banner */}
+          <div className="rounded-2xl bg-gradient-to-br from-primary-container via-primary to-inverse-surface p-xl sm:p-2xl mb-xl relative overflow-hidden">
+            <div className="absolute -right-16 -top-16 w-64 h-64 bg-white/10 rounded-full blur-3xl" aria-hidden="true"></div>
+            <div className="relative">
+              <div className="flex items-center gap-sm mb-md">
+                <span className={`px-md py-xs text-label-sm font-bold rounded-lg ${status.bg} ${status.text}`}>
+                  {status.label}
+                </span>
+              </div>
+              <h1 className="font-display-lg text-display-lg text-white mb-md">{event.title}</h1>
+              <p className="text-body-lg text-white/80 max-w-2xl">{event.description}</p>
+            </div>
+          </div>
+
+          {/* Registration Action Card — only for 'user' role */}
+          {canRegister && (
+            <div className="bg-surface-container-lowest rounded-xl border border-outline-variant p-lg mb-xl">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-md">
+                <div className="flex items-center gap-sm">
+                  <span className="material-symbols-outlined text-primary shrink-0" aria-hidden="true">
+                    {isRegistered ? 'how_to_reg' : 'person_add'}
+                  </span>
+                  <div>
+                    <h3 className="font-headline-sm text-headline-sm text-on-surface">
+                      {isRegistered ? 'You are registered' : 'Ready to attend?'}
+                    </h3>
+                    <p className="text-body-sm text-on-surface-variant">
+                      {isRegistered
+                        ? 'You have a spot reserved for this event.'
+                        : 'Register now to secure your spot.'}
+                    </p>
+                  </div>
+                </div>
+
+                {checkingRegistration ? (
+                  <span className="text-body-sm text-on-surface-variant">Checking status...</span>
+                ) : isRegistered ? (
+                  <button
+                    onClick={handleCancel}
+                    disabled={registering}
+                    className="w-full sm:w-auto px-xl py-sm bg-red-50 text-red-600 border border-red-200 rounded-lg font-label-md hover:bg-red-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-sm"
+                    aria-label="Cancel registration for this event"
+                  >
+                    {registering ? (
+                      <>
+                        <span className="material-symbols-outlined animate-spin text-[18px]" aria-hidden="true">sync</span>
+                        Cancelling...
+                      </>
+                    ) : (
+                      <>
+                        <span className="material-symbols-outlined text-[18px]" aria-hidden="true">cancel</span>
+                        Cancel Registration
+                      </>
+                    )}
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleRegister}
+                    disabled={registering}
+                    className="w-full sm:w-auto px-xl py-sm bg-primary text-on-primary rounded-lg font-label-md hover:bg-primary-container transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-sm shadow-md"
+                    aria-label="Register for this event"
+                  >
+                    {registering ? (
+                      <>
+                        <span className="material-symbols-outlined animate-spin text-[18px]" aria-hidden="true">sync</span>
+                        Registering...
+                      </>
+                    ) : (
+                      <>
+                        <span className="material-symbols-outlined text-[18px]" aria-hidden="true">app_registration</span>
+                        Register
+                      </>
+                    )}
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Info Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-lg mb-xl">
+            {/* Date & Time */}
+            <div className="bg-surface-container-lowest rounded-xl border border-outline-variant p-lg">
+              <div className="flex items-center gap-sm mb-md">
+                <span className="material-symbols-outlined text-primary" aria-hidden="true">calendar_today</span>
+                <h3 className="font-headline-sm text-headline-sm text-on-surface">Date &amp; Time</h3>
+              </div>
+              <p className="text-body-md text-on-surface mb-xs">{formatDate(event.date)}</p>
+              <p className="text-body-sm text-on-surface-variant">{formatTime(event.time)}</p>
+            </div>
+
+            {/* Location */}
+            <div className="bg-surface-container-lowest rounded-xl border border-outline-variant p-lg">
+              <div className="flex items-center gap-sm mb-md">
+                <span className="material-symbols-outlined text-primary" aria-hidden="true">location_on</span>
+                <h3 className="font-headline-sm text-headline-sm text-on-surface">Location</h3>
+              </div>
+              <p className="text-body-md text-on-surface">{event.location}</p>
+            </div>
+
+            {/* Capacity */}
+            <div className="bg-surface-container-lowest rounded-xl border border-outline-variant p-lg">
+              <div className="flex items-center gap-sm mb-md">
+                <span className="material-symbols-outlined text-primary" aria-hidden="true">group</span>
+                <h3 className="font-headline-sm text-headline-sm text-on-surface">Capacity</h3>
+              </div>
+              <p className="text-body-md text-on-surface">{event.capacity} attendees</p>
+            </div>
+
+            {/* Status */}
+            <div className="bg-surface-container-lowest rounded-xl border border-outline-variant p-lg">
+              <div className="flex items-center gap-sm mb-md">
+                <span className="material-symbols-outlined text-primary" aria-hidden="true">info</span>
+                <h3 className="font-headline-sm text-headline-sm text-on-surface">Status</h3>
+              </div>
+              <span className={`inline-block px-md py-xs rounded-lg text-label-md font-bold ${status.bg} ${status.text}`}>
                 {status.label}
               </span>
             </div>
-            <h1 className="font-display-lg text-display-lg text-white mb-md">{event.title}</h1>
-            <p className="text-body-lg text-white/80 max-w-2xl">{event.description}</p>
           </div>
-        </div>
 
-        {/* Registration Action Card — only for 'user' role */}
-        {canRegister && (
-          <div className="bg-surface-container-lowest rounded-xl border border-outline-variant p-lg mb-xl">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-md">
-              <div className="flex items-center gap-sm">
-                <span className="material-symbols-outlined text-primary shrink-0" aria-hidden="true">
-                  {isRegistered ? 'how_to_reg' : 'person_add'}
-                </span>
-                <div>
-                  <h3 className="font-headline-sm text-headline-sm text-on-surface">
-                    {isRegistered ? 'You are registered' : 'Ready to attend?'}
-                  </h3>
-                  <p className="text-body-sm text-on-surface-variant">
-                    {isRegistered
-                      ? 'You have a spot reserved for this event.'
-                      : 'Register now to secure your spot.'}
-                  </p>
+          {/* Organizer Info */}
+          {event.organizer && (
+            <div className="bg-surface-container-lowest rounded-xl border border-outline-variant p-lg mb-xl">
+              <div className="flex items-center gap-sm mb-md">
+                <span className="material-symbols-outlined text-primary" aria-hidden="true">person</span>
+                <h3 className="font-headline-sm text-headline-sm text-on-surface">Organizer</h3>
+              </div>
+              <div className="flex items-center gap-md">
+                <div
+                  className="w-12 h-12 rounded-full bg-primary-fixed flex items-center justify-center shrink-0"
+                  aria-hidden="true"
+                >
+                  <span className="text-primary font-bold text-lg">
+                    {event.organizer.full_name?.charAt(0) || 'O'}
+                  </span>
+                </div>
+                <div className="min-w-0">
+                  <p className="font-label-md text-on-surface font-bold truncate">{event.organizer.full_name}</p>
+                  <p className="text-body-sm text-on-surface-variant truncate">{event.organizer.email}</p>
                 </div>
               </div>
-
-              {checkingRegistration ? (
-                <span className="text-body-sm text-on-surface-variant">Checking status...</span>
-              ) : isRegistered ? (
-                <button
-                  onClick={handleCancel}
-                  disabled={registering}
-                  className="w-full sm:w-auto px-xl py-sm bg-red-50 text-red-600 border border-red-200 rounded-lg font-label-md hover:bg-red-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-sm"
-                  aria-label="Cancel registration for this event"
-                >
-                  {registering ? (
-                    <>
-                      <span className="material-symbols-outlined animate-spin text-[18px]" aria-hidden="true">sync</span>
-                      Cancelling...
-                    </>
-                  ) : (
-                    <>
-                      <span className="material-symbols-outlined text-[18px]" aria-hidden="true">cancel</span>
-                      Cancel Registration
-                    </>
-                  )}
-                </button>
-              ) : (
-                <button
-                  onClick={handleRegister}
-                  disabled={registering}
-                  className="w-full sm:w-auto px-xl py-sm bg-primary text-on-primary rounded-lg font-label-md hover:bg-primary-container transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-sm shadow-md"
-                  aria-label="Register for this event"
-                >
-                  {registering ? (
-                    <>
-                      <span className="material-symbols-outlined animate-spin text-[18px]" aria-hidden="true">sync</span>
-                      Registering...
-                    </>
-                  ) : (
-                    <>
-                      <span className="material-symbols-outlined text-[18px]" aria-hidden="true">app_registration</span>
-                      Register
-                    </>
-                  )}
-                </button>
-              )}
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Info Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-lg mb-xl">
-          {/* Date & Time */}
-          <div className="bg-surface-container-lowest rounded-xl border border-outline-variant p-lg">
-            <div className="flex items-center gap-sm mb-md">
-              <span className="material-symbols-outlined text-primary" aria-hidden="true">calendar_today</span>
-              <h3 className="font-headline-sm text-headline-sm text-on-surface">Date &amp; Time</h3>
-            </div>
-            <p className="text-body-md text-on-surface mb-xs">{formatDate(event.date)}</p>
-            <p className="text-body-sm text-on-surface-variant">{formatTime(event.time)}</p>
-          </div>
-
-          {/* Location */}
-          <div className="bg-surface-container-lowest rounded-xl border border-outline-variant p-lg">
-            <div className="flex items-center gap-sm mb-md">
-              <span className="material-symbols-outlined text-primary" aria-hidden="true">location_on</span>
-              <h3 className="font-headline-sm text-headline-sm text-on-surface">Location</h3>
-            </div>
-            <p className="text-body-md text-on-surface">{event.location}</p>
-          </div>
-
-          {/* Capacity */}
-          <div className="bg-surface-container-lowest rounded-xl border border-outline-variant p-lg">
-            <div className="flex items-center gap-sm mb-md">
-              <span className="material-symbols-outlined text-primary" aria-hidden="true">group</span>
-              <h3 className="font-headline-sm text-headline-sm text-on-surface">Capacity</h3>
-            </div>
-            <p className="text-body-md text-on-surface">{event.capacity} attendees</p>
-          </div>
-
-          {/* Status */}
-          <div className="bg-surface-container-lowest rounded-xl border border-outline-variant p-lg">
-            <div className="flex items-center gap-sm mb-md">
-              <span className="material-symbols-outlined text-primary" aria-hidden="true">info</span>
-              <h3 className="font-headline-sm text-headline-sm text-on-surface">Status</h3>
-            </div>
-            <span className={`inline-block px-md py-xs rounded-lg text-label-md font-bold ${status.bg} ${status.text}`}>
-              {status.label}
-            </span>
-          </div>
-        </div>
-
-        {/* Organizer Info */}
-        {event.organizer && (
+          {/* Description Full */}
           <div className="bg-surface-container-lowest rounded-xl border border-outline-variant p-lg mb-xl">
-            <div className="flex items-center gap-sm mb-md">
-              <span className="material-symbols-outlined text-primary" aria-hidden="true">person</span>
-              <h3 className="font-headline-sm text-headline-sm text-on-surface">Organizer</h3>
-            </div>
-            <div className="flex items-center gap-md">
-              <div
-                className="w-12 h-12 rounded-full bg-primary-fixed flex items-center justify-center shrink-0"
-                aria-hidden="true"
-              >
-                <span className="text-primary font-bold text-lg">
-                  {event.organizer.full_name?.charAt(0) || 'O'}
-                </span>
-              </div>
-              <div className="min-w-0">
-                <p className="font-label-md text-on-surface font-bold truncate">{event.organizer.full_name}</p>
-                <p className="text-body-sm text-on-surface-variant truncate">{event.organizer.email}</p>
-              </div>
-            </div>
+            <h3 className="font-headline-sm text-headline-sm text-on-surface mb-md">About this event</h3>
+            <p className="text-body-md text-on-surface-variant whitespace-pre-wrap">{event.description}</p>
           </div>
-        )}
 
-        {/* Description Full */}
-        <div className="bg-surface-container-lowest rounded-xl border border-outline-variant p-xl mb-xl">
-          <h3 className="font-headline-sm text-headline-sm text-on-surface mb-md">About this event</h3>
-          <p className="text-body-md text-on-surface-variant whitespace-pre-wrap">{event.description}</p>
-        </div>
-
-        {/* Metadata */}
-        <div className="text-body-sm text-on-surface-variant text-center">
-          <p>Event ID: {event.id} &bull; Created: {new Date(event.created_at).toLocaleDateString()}</p>
-        </div>
-      </main>
-    </div>
+          {/* Metadata */}
+          <div className="text-body-sm text-on-surface-variant text-center">
+            <p>Event ID: {event.id} &bull; Created: {new Date(event.created_at).toLocaleDateString()}</p>
+          </div>
+        </>
+      )}
+    </>
   )
 }
 

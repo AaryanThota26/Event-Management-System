@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import { useAuth } from './hooks/useAuth'
+import AuthenticatedLayout from './components/AuthenticatedLayout'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
 import Dashboard from './pages/Dashboard'
@@ -68,7 +69,9 @@ function App() {
             path="/events"
             element={
               <ProtectedRoute>
-                <Events />
+                <AuthenticatedLayout>
+                  <Events />
+                </AuthenticatedLayout>
               </ProtectedRoute>
             }
           />
@@ -76,7 +79,9 @@ function App() {
             path="/events/:id"
             element={
               <ProtectedRoute>
-                <EventDetail />
+                <AuthenticatedLayout>
+                  <EventDetail />
+                </AuthenticatedLayout>
               </ProtectedRoute>
             }
           />
@@ -84,7 +89,9 @@ function App() {
             path="/user/registrations"
             element={
               <ProtectedRoute>
-                <MyRegistrations />
+                <AuthenticatedLayout>
+                  <MyRegistrations />
+                </AuthenticatedLayout>
               </ProtectedRoute>
             }
           />
@@ -92,7 +99,9 @@ function App() {
             path="/admin/dashboard"
             element={
               <ProtectedRoute allowedRoles={['admin']}>
-                <AdminDashboard />
+                <AuthenticatedLayout>
+                  <AdminDashboard />
+                </AuthenticatedLayout>
               </ProtectedRoute>
             }
           />
@@ -100,7 +109,9 @@ function App() {
             path="/organizer/dashboard"
             element={
               <ProtectedRoute allowedRoles={['organizer']}>
-                <OrganizerDashboard />
+                <AuthenticatedLayout>
+                  <OrganizerDashboard />
+                </AuthenticatedLayout>
               </ProtectedRoute>
             }
           />
@@ -108,7 +119,9 @@ function App() {
             path="/user/dashboard"
             element={
               <ProtectedRoute allowedRoles={['user']}>
-                <Dashboard />
+                <AuthenticatedLayout>
+                  <Dashboard />
+                </AuthenticatedLayout>
               </ProtectedRoute>
             }
           />
