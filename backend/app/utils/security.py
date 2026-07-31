@@ -1,16 +1,20 @@
 """
 Security Utilities
 ------------------
-Provides password hashing/verification and JWT token creation/verification.
+Provides password hashing/verification, JWT token creation/verification,
+and password-reset token generation/hashing.
 
 Uses:
     - passlib with bcrypt for password hashing
     - python-jose for JWT tokens
+    - secrets + hashlib (stdlib) for password-reset tokens
 
 These are standalone utility functions with no FastAPI dependency,
 making them reusable in tests, scripts, and other contexts.
 """
 
+import hashlib
+import secrets
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
@@ -67,6 +71,40 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
         False
     """
     return pwd_context.verify(plain_password, hashed_password)
+
+
+# ---------------------------------------------------------------------------
+# Password Reset Tokens
+# ---------------------------------------------------------------------------
+
+def generate_reset_token() -> str:
+    """
+    Generate a cryptographically secure random password-reset token.
+
+    secrets.token_urlsafe(32) yields 32 bytes (256 bits) of entropy
+    encoded as a URL-safe base64 string, safe to place directly in
+    an email link.
+
+    Returns:
+        A 43-character URL-safe token.
+    """
+    return secrets.token_urlsafe(32)
+
+
+def hash_token(token: str) -> str:
+    """
+    Hash a reset token with SHA-256.
+
+    Only the hash is ever persisted, never the raw token: if the
+    database is leaked, the tokens are useless to an attacker.
+
+    Args:
+        token: The raw reset token.
+
+    Returns:
+        A 64-character lowercase hex digest.
+    """
+    return hashlib.sha256(token.encode("utf-8")).hexdigest()
 
 
 # ---------------------------------------------------------------------------

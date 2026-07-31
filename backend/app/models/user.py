@@ -11,6 +11,8 @@ Roles:
 
 import enum
 from datetime import datetime, timezone
+from typing import Optional
+
 from sqlalchemy import String, Enum, DateTime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.core.database import Base
@@ -60,6 +62,19 @@ class User(Base):
         default=UserRole.USER,
         nullable=False,
         comment="User role: user, organizer, or admin"
+    )
+
+    # Password reset (Phase 2)
+    # Stores the SHA-256 hash of the reset token, never the raw token.
+    reset_token: Mapped[Optional[str]] = mapped_column(
+        String(64),
+        nullable=True,
+        comment="SHA-256 hash of the password reset token (None when not resetting)",
+    )
+    reset_token_expiry: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True,
+        comment="UTC timestamp when the reset token expires",
     )
 
     # Timestamps

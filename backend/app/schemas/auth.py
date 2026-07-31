@@ -80,6 +80,47 @@ class UserLogin(BaseModel):
     )
 
 
+class ForgotPasswordRequest(BaseModel):
+    """
+    Schema for requesting a password reset email.
+
+    Example body:
+        {
+            "email": "john@example.com"
+        }
+    """
+    email: EmailStr = Field(
+        ...,
+        description="Email address to send the reset link to",
+        examples=["john@example.com"],
+    )
+
+
+class ResetPasswordRequest(BaseModel):
+    """
+    Schema for resetting a password with a reset token.
+
+    Example body:
+        {
+            "token": "PyQSBqcZt68rNtW6mKw11E7uQW0o3fMp3LN8o0UY3EI",
+            "new_password": "newsecurepass123"
+        }
+    """
+    token: str = Field(
+        ...,
+        min_length=8,
+        max_length=512,
+        description="Password reset token from the emailed link",
+    )
+    new_password: str = Field(
+        ...,
+        min_length=6,
+        max_length=128,
+        description="New password (min 6 characters)",
+        examples=["newsecurepass123"],
+    )
+
+
 # ---------------------------------------------------------------------------
 # Response Schemas (what the API returns)
 # ---------------------------------------------------------------------------

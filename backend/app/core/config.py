@@ -32,6 +32,12 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
+    # Email / Password Reset (Resend)
+    RESEND_API_KEY: str = ""
+    RESEND_FROM_EMAIL: str = "EventPro <onboarding@resend.dev>"
+    FRONTEND_URL: str = "http://localhost:5173"
+    RESET_TOKEN_EXPIRE_MINUTES: int = 15
+
     class Config:
         env_file = ".env"
         case_sensitive = True

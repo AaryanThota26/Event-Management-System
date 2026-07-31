@@ -2,14 +2,7 @@ import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import EventProLogo from '../components/EventProLogo'
-import SocialButton from '../components/SocialButton'
 import FormInput from '../components/FormInput'
-
-const GOOGLE_ICON =
-  'https://lh3.googleusercontent.com/aida-public/AB6AXuAIeKiyBHRWTYjo2aqJxS8XZkjKvy5b93RrTBB0l0TnDK0ffX00a0FCSTvO0OoKzrNzPYvzy7D2y7JvublfH7M97dl06YiUGz-wkhra3yAdRNHsUnm0s2AQoW7lgehvCRZO8KTguDPHMSWrjr5E56YXQx0e6XWJl8owMpF_Tk85rM4nhK-0HYNGvvcOo4qI_qgQoF26Mwm9RVb13VMJEcILLXAvCowJLV38VVSj_oVRjfGdDbp0sVIq5ZJmsRBEHWFtVLxu26RKvL8'
-
-const APPLE_ICON =
-  'https://lh3.googleusercontent.com/aida-public/AB6AXuBaibZlrnKgvxTLeGHmlbONqDvfoSj84epcvvMAcj92Ui5eRhUqUkrLh8SCldvsMcwBShCvqJ67mjSZhgMdKVLMD8GrSJl75wVwZTbR4rsHeK2UTirsBvCPHy3mtfXqwJtwAERNfUmSWE080oP0ZSWgtlMDejIDB8PfiWfv3BfMQGzsPZg6dBMfdGkaO6BAOZbeDV5Fx9iLlynjK1gNQG76IAKU54Uzt8ZB-WTI8wNrJD5_P0g6CK6fQzJgMODbkjBELthyl3hAmIA'
 
 const ROLE_ROUTES = {
   admin: '/admin/dashboard',
@@ -111,24 +104,6 @@ const Login = () => {
             </p>
           </div>
 
-          {/* Social Login Buttons */}
-          <div className="flex flex-col sm:flex-row gap-md mb-xl">
-            <SocialButton icon={GOOGLE_ICON} label="Google" />
-            <SocialButton icon={APPLE_ICON} label="Apple" />
-          </div>
-
-          {/* Divider */}
-          <div className="relative mb-xl" role="separator" aria-orientation="horizontal">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-outline-variant"></div>
-            </div>
-            <div className="relative flex justify-center text-label-sm text-label-sm uppercase">
-              <span className="bg-surface-container-lowest px-md text-on-surface-variant">
-                Or continue with email
-              </span>
-            </div>
-          </div>
-
           {/* General Error Message */}
           {error && (
             <div
@@ -179,13 +154,12 @@ const Login = () => {
               error={fieldErrors.password}
               autoComplete="current-password"
               rightElement={
-                <a
+                <Link
                   className="font-label-sm text-label-sm text-primary hover:underline"
-                  href="#"
-                  tabIndex={-1}
+                  to="/forgot-password"
                 >
                   Forgot password?
-                </a>
+                </Link>
               }
             />
 
