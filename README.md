@@ -4,16 +4,50 @@
 
 **A full-stack event platform with role-based access — organizers publish events, admins curate them, and users register in one click.**
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Vercel-000000?logo=vercel&logoColor=white)](https://event-management-system-ruby-gamma.vercel.app)
+[![API Docs](https://img.shields.io/badge/API%20Docs-Swagger-85EA2D?logo=swagger&logoColor=black)](https://event-management-api-aw25.onrender.com/docs)
+
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 [![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)](https://react.dev)
 [![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)](https://www.python.org)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org)
+[![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-2.0-D71F00?logo=sqlalchemy&logoColor=white)](https://www.sqlalchemy.org)
 [![JWT](https://img.shields.io/badge/Auth-JWT-000000?logo=jsonwebtokens&logoColor=white)](https://jwt.io)
-[![Vercel](https://img.shields.io/badge/Frontend-Vercel-000000?logo=vercel&logoColor=white)](https://vercel.com)
+
+[![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white)](https://vite.dev)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-3-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
+[![Axios](https://img.shields.io/badge/Axios-5A29E4?logo=axios&logoColor=white)](https://axios-http.com)
+[![Resend](https://img.shields.io/badge/Email-Resend-000000?logo=resend&logoColor=white)](https://resend.com)
+[![Neon](https://img.shields.io/badge/DB-Neon-00E599?logo=neon&logoColor=white)](https://neon.tech)
 [![Render](https://img.shields.io/badge/Backend-Render-46E3B7?logo=render&logoColor=white)](https://render.com)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 </div>
+
+---
+
+## 📑 Table of Contents
+
+- [📖 Overview](#overview)
+- [💡 Project Highlights](#project-highlights)
+- [🚀 Quick Start](#quick-start)
+- [🔗 Live Demo](#live-demo)
+- [✨ Features](#features)
+- [🛠️ Tech Stack](#tech-stack)
+- [🏗️ System Architecture](#system-architecture)
+- [📁 Project Structure](#project-structure)
+- [🗄️ Database Design](#database-design)
+- [🔑 Authentication Flow](#authentication-flow)
+- [👥 User Roles](#user-roles)
+- [📡 API Endpoints](#api-endpoints)
+- [🚀 Installation](#installation)
+- [🔧 Environment Variables](#environment-variables)
+- [📸 Screenshots](#screenshots)
+- [🚧 Future Improvements](#future-improvements)
+- [📄 License](#license)
+- [👤 Author](#author)
+- [🤝 Contributing](#contributing)
+- [🙏 Acknowledgements](#acknowledgements)
 
 ---
 
@@ -27,19 +61,67 @@ Planning an event is hard enough without a dozen spreadsheets, email threads, an
 
 Every event has a hard capacity limit, duplicate sign-ups are impossible by design, and the whole flow is protected by JWT authentication and bcrypt password hashing. The API is documented with Swagger UI out of the box, and the app is deployed end-to-end — React on Vercel, FastAPI on Render, PostgreSQL in the cloud.
 
+---
+
+## 💡 Project Highlights
+
+- **Three-role platform** — `user`, `organizer`, and `admin` each get their own dashboard, permissions, and server-enforced access control.
+- **Moderation-first event lifecycle** — organizer submissions start as `pending`; nothing becomes visible to attendees until an admin approves it. Editing an approved event sends it back for re-review.
+- **Hardened authentication** — bcrypt password hashing, HS256 JWT with role claims, and a password-reset flow built around single-use, SHA-256-hashed tokens with anti-enumeration responses.
+- **Rules enforced in two layers** — business logic (capacity, duplicates, ownership) lives in the service layer, with a database-level `UNIQUE (user_id, event_id)` constraint as the backstop.
+- **Self-documenting API** — Swagger UI and ReDoc generated straight from Pydantic schemas, with an "Authorize" button wired to the JWT scheme.
+- **Deployed end-to-end** — React on Vercel, FastAPI on Render, PostgreSQL on Neon, transactional email via Resend.
+
+---
+
+## 🚀 Quick Start
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/AaryanThota26/Event-Management-System.git
+cd Event-Management-System
+
+# 2. Backend — virtual env + dependencies
+cd backend
+python -m venv venv
+source venv/Scripts/activate          # Windows (git-bash / cmd)
+# source venv/bin/activate            # macOS / Linux
+pip install -r requirements.txt
+cp .env.example .env                  # then add your DB credentials
+
+# 3. Database — create the database and tables
+python setup_db.py
+python create_tables.py
+
+# 4. Run the API
+uvicorn app.main:app --reload         # Swagger UI at http://localhost:8000/docs
+
+# 5. Frontend — new terminal
+cd ../frontend
+npm install
+npm run dev                           # App at http://localhost:5173
+```
+
+Full walkthrough with prerequisites → [🚀 Installation](#installation).
+
+---
+
 ## 🔗 Live Demo
 
 | Service | URL |
 |---|---|
-| 🌐 Frontend | [event-management-system-ruby-gamma.vercel.app](https://event-management-system-ruby-gamma.vercel.app) |
-| 🔌 Backend API | [event-management-api-aw25.onrender.com](https://event-management-api-aw25.onrender.com) |
-| 📚 Swagger Docs | [event-management-api-aw25.onrender.com/docs](https://event-management-api-aw25.onrender.com/docs) |
+| Frontend | [event-management-system-ruby-gamma.vercel.app](https://event-management-system-ruby-gamma.vercel.app) |
+| Backend API | [event-management-api-aw25.onrender.com](https://event-management-api-aw25.onrender.com) |
+| Swagger Docs | [event-management-api-aw25.onrender.com/docs](https://event-management-api-aw25.onrender.com/docs) |
 
 > These are the URLs wired into the codebase (CORS origins and the frontend API client). If you redeploy, update the CORS list in `backend/app/main.py` and `API_BASE_URL` in `frontend/src/utils/apiConfig.js`.
+
+---
 
 ## ✨ Features
 
 ### 🔐 Authentication
+
 - Email + password signup and login with **bcrypt** password hashing (salted, never stored in plain text)
 - **JWT access tokens** (HS256, 30-minute expiry) returned on login and sent as `Bearer` tokens
 - **Forgot password** flow: single-use, time-limited reset tokens emailed via **Resend**
@@ -47,23 +129,27 @@ Every event has a hard capacity limit, duplicate sign-ups are impossible by desi
 - Anti-enumeration: the API returns the same response whether or not an email exists, and equalizes timing with a dummy hash
 
 ### 👤 User Features
+
 - Browse the catalog of **admin-approved** events
 - Register for events in one click — with duplicate-registration and capacity enforcement
 - Cancel a registration at any time
 - Personal dashboard listing all registrations ("My Registrations")
 
 ### 🗂️ Organizer Features
+
 - Create events with title, description, date, time, location, and capacity
 - Manage a personal event dashboard — new events start as **Pending** awaiting admin approval
 - Edit and delete only their own events
 - View the participant list for their own events
 
 ### 🛡️ Admin Features
+
 - Approve or reject pending events (the moderation queue)
 - See every event in the system, regardless of status
 - Edit/delete any event and view participants for any event
 
 ### 🔒 Security Features
+
 - Role-based access control (`user` / `organizer` / `admin`) enforced server-side on every protected route
 - Passwords hashed with bcrypt via Passlib
 - JWT verification with `HTTPBearer` — Swagger's "Authorize" button works out of the box
@@ -72,9 +158,12 @@ Every event has a hard capacity limit, duplicate sign-ups are impossible by desi
 - HTML-escaped email templates to prevent injection
 
 ### 🚀 Deployment Features
+
 - **Vercel**: SPA with rewrite rules (`vercel.json`) so client-side routes survive hard refreshes
-- **Render**: backend pinned to Python 3.12 (`runtime.txt`), zero-config `uvicorn` start
+- **Render**: backend pinned to Python 3.12 (`runtime.txt`), started with `uvicorn app.main:app`
 - **Environment-driven config** via `pydantic-settings` — one `.env` file switches local ↔ production
+
+---
 
 ## 🛠️ Tech Stack
 
@@ -92,38 +181,40 @@ Every event has a hard capacity limit, duplicate sign-ups are impossible by desi
 | **Email** | [Resend](https://resend.com) | Transactional password-reset emails |
 | **Deployment** | [Vercel](https://vercel.com) + [Render](https://render.com) | Frontend hosting, backend hosting |
 
-## 🏗️ Architecture
+---
+
+## 🏗️ System Architecture
 
 ```
-+---------------------+
-|       Browser       |
-+----------+----------+
-           |
-           |  HTTPS
-           v
-+------------------------------+
-|   React Frontend (Vercel)    |
-|   React 19 · Vite · Router   |
-|   Axios · Tailwind CSS       |
-+----------+-------------------+
-           |
-           |  REST + JSON (JWT Bearer)
-           v
-+------------------------------+
-|   FastAPI Backend (Render)   |
-|   Routers → Services → ORM   |
-+----------+-------------------+
-           |                        \
-           | SQLAlchemy ORM          | Resend API
-           v                         v
-+---------------------+   +------------------------+
-|  PostgreSQL (Neon)  |   |  Resend Email Service  |
-|  users · events ·   |   |  password-reset emails |
-|  registrations      |   |                        |
-+---------------------+   +------------------------+
++----------------------------+
+|          Browser           |
++--------------+-------------+
+               |
+               |  HTTPS
+               v
++----------------------------+
+|      React Frontend        |
+|   (Vercel · React 19)      |
++--------------+-------------+
+               |
+               |  REST + JSON · JWT Bearer
+               v
++----------------------------+
+|      FastAPI Backend       |
+|  (Render · Python 3.12)    |
++-------+-------------+------+
+        |             |
+        |  SQLAlchemy |  Resend API
+        v             v
++--------------+  +--------------------+
+|  PostgreSQL  |  |       Resend       |
+|    (Neon)    |  |  (reset emails)    |
++--------------+  +--------------------+
 ```
 
-The backend follows a clean **router → service → model** layering: API routes (`app/api/`) handle HTTP concerns and authorization, services (`app/services/`) contain all business rules (capacity checks, approval workflow, ownership checks), and models (`app/models/`) define the schema.
+The backend follows a clean **router → service → model** layering: API routes (`app/api/`) handle HTTP concerns and authorization, services (`app/services/`) contain all business rules (capacity checks, approval workflow, ownership checks), and models (`app/models/`) define the schema. The browser talks to the React SPA, which calls the FastAPI REST API with a JWT bearer token; the backend persists through SQLAlchemy into Neon-hosted PostgreSQL, and the password-reset flow reaches users through the Resend email service.
+
+---
 
 ## 📁 Project Structure
 
@@ -158,7 +249,9 @@ event-management-system/
 │   ├── runtime.txt                 # Render: Python 3.12
 │   ├── .env.example                # Environment template
 │   ├── setup_db.py                 # Creates the PostgreSQL database
-│   └── create_tables.py            # Creates tables + verifies schema
+│   ├── create_tables.py            # Creates tables + verifies schema
+│   ├── test_auth.py                # Authorization audit (endpoints × roles)
+│   └── validate_models.py          # Model definition validation (no DB needed)
 └── frontend/                       # React SPA
     ├── src/
     │   ├── pages/                  # Login, Signup, Forgot/Reset Password,
@@ -177,6 +270,8 @@ event-management-system/
     └── vercel.json                 # SPA rewrite rules for Vercel
 ```
 
+---
+
 ## 🗄️ Database Design
 
 Three tables form the core, connected by foreign keys and protected by a unique constraint.
@@ -189,6 +284,7 @@ users ──────┬──< events ──────< registrations >─
 ```
 
 ### `users`
+
 | Column | Type | Notes |
 |---|---|---|
 | `id` | SERIAL (PK) | Indexed |
@@ -201,6 +297,7 @@ users ──────┬──< events ──────< registrations >─
 | `created_at` | TIMESTAMPTZ | Auto-set on insert |
 
 ### `events`
+
 | Column | Type | Notes |
 |---|---|---|
 | `id` | SERIAL (PK) | Indexed |
@@ -215,6 +312,7 @@ users ──────┬──< events ──────< registrations >─
 | `created_at` | TIMESTAMPTZ | Auto-set on insert |
 
 ### `registrations`
+
 | Column | Type | Notes |
 |---|---|---|
 | `id` | SERIAL (PK) | Indexed |
@@ -223,10 +321,13 @@ users ──────┬──< events ──────< registrations >─
 | `registered_at` | TIMESTAMPTZ | Auto-set on insert |
 
 **Key relationships & constraints:**
+
 - A **user** (as organizer) has many **events**; an event belongs to one organizer.
 - A **user** has many **registrations**; an **event** has many registrations.
 - `UNIQUE (user_id, event_id)` guarantees **one registration per user per event** — enforced at the database level, not just in app code.
 - **Event status lifecycle:** `pending → approved` (or `rejected`) by an admin. Editing an approved event resets it to `pending` so changes are re-reviewed.
+
+---
 
 ## 🔑 Authentication Flow
 
@@ -245,6 +346,8 @@ users ──────┬──< events ──────< registrations >─
 5. **Forgot Password** — `POST /api/auth/forgot-password` generates a cryptographically secure token (`secrets.token_urlsafe(32)`), stores **only its SHA-256 hash** with a 15-minute expiry, and emails a reset link via Resend. The response is identical whether or not the account exists (anti-enumeration).
 6. **Reset Password** — `POST /api/auth/reset-password` hashes the submitted token, looks it up, rejects expired/used tokens with a generic message, sets the new bcrypt hash, and invalidates the token (single-use).
 
+---
+
 ## 👥 User Roles
 
 | Role | Can do | Redirected to |
@@ -255,9 +358,13 @@ users ──────┬──< events ──────< registrations >─
 
 Role membership is assigned at signup (defaults to `user`) and is enforced twice: **client-side** (protected routes with `allowedRoles` redirect unauthorized users to their own dashboard) and **server-side** (the `require_role` dependency returns `403` with the required-vs-actual role message).
 
+---
+
 ## 📡 API Endpoints
 
 Base URL: `https://event-management-api-aw25.onrender.com` · Interactive docs at `/docs`
+
+> Endpoints not marked **Public** require a valid JWT `Bearer` token in the `Authorization` header.
 
 ### Authentication (`/api/auth`)
 
@@ -267,51 +374,54 @@ Base URL: `https://event-management-api-aw25.onrender.com` · Interactive docs a
 | `POST` | `/login` | Authenticate and receive a JWT access token | Public |
 | `POST` | `/forgot-password` | Email a single-use password reset link | Public |
 | `POST` | `/reset-password` | Set a new password with a valid reset token | Public |
-| `GET` | `/me` | Get the authenticated user's profile | 🔒 Any logged-in user |
+| `GET` | `/me` | Get the authenticated user's profile | Authenticated |
 
 ### Events (`/api/events`)
 
 | Method | Endpoint | Description | Access |
 |---|---|---|---|
-| `POST` | `/` | Create an event (starts as `pending`) | 🔒 Organizer |
-| `GET` | `/` | List events — role-based visibility (users: approved, organizers: own, admins: all). Supports `skip`/`limit` | 🔒 Any logged-in user |
-| `GET` | `/{event_id}` | Get full event details with organizer info | 🔒 Any logged-in user |
-| `PUT` | `/{event_id}` | Update an event (own only for organizers; any for admins; approved → resets to pending) | 🔒 Organizer, Admin |
-| `DELETE` | `/{event_id}` | Delete an event | 🔒 Organizer, Admin |
-| `POST` | `/{event_id}/register` | Register for an event (capacity + duplicate checks) | 🔒 User |
-| `DELETE` | `/{event_id}/register` | Cancel your registration | 🔒 User |
-| `GET` | `/{event_id}/participants` | List registered participants | 🔒 Organizer (own), Admin |
+| `POST` | `/` | Create an event (starts as `pending`) | Organizer |
+| `GET` | `/` | List events — role-based visibility (users: approved, organizers: own, admins: all). Supports `skip`/`limit` | Authenticated |
+| `GET` | `/{event_id}` | Get full event details with organizer info | Authenticated |
+| `PUT` | `/{event_id}` | Update an event (own only for organizers; any for admins; approved → resets to pending) | Organizer, Admin |
+| `DELETE` | `/{event_id}` | Delete an event | Organizer, Admin |
+| `POST` | `/{event_id}/register` | Register for an event (capacity + duplicate checks) | User |
+| `DELETE` | `/{event_id}/register` | Cancel your registration | User |
+| `GET` | `/{event_id}/participants` | List registered participants | Organizer (own), Admin |
 
 ### Registrations (`/api/registrations`)
 
 | Method | Endpoint | Description | Access |
 |---|---|---|---|
-| `GET` | `/my` | All events the current user registered for (with event details) | 🔒 Any logged-in user |
+| `GET` | `/my` | All events the current user registered for (with event details) | Authenticated |
 
 ### Admin (`/api/events`)
 
 | Method | Endpoint | Description | Access |
 |---|---|---|---|
-| `PATCH` | `/{event_id}/approve` | Approve a pending event (`pending → approved`) | 🔒 Admin |
-| `PATCH` | `/{event_id}/reject` | Reject a pending event (`pending → rejected`) | 🔒 Admin |
+| `PATCH` | `/{event_id}/approve` | Approve a pending event (`pending → approved`) | Admin |
+| `PATCH` | `/{event_id}/reject` | Reject a pending event (`pending → rejected`) | Admin |
 
 Plus health endpoints: `GET /` (service info + docs link) and `GET /health` (readiness probe).
+
+---
 
 ## 🚀 Installation
 
 ### Prerequisites
-- [Python 3.12](https://www.python.org/downloads/)
-- [Node.js 18+](https://nodejs.org/) (npm included)
-- [PostgreSQL](https://www.postgresql.org/download/) 14+ running locally
 
-### 1. Clone the repository
+- [Python 3.12](https://www.python.org/downloads/) (the version pinned in `runtime.txt`)
+- [Node.js 20+](https://nodejs.org/) (npm included — required by Vite 8)
+- [PostgreSQL](https://www.postgresql.org/download/) running locally
+
+### Step 1 — Clone the repository
 
 ```bash
 git clone https://github.com/AaryanThota26/Event-Management-System.git
 cd Event-Management-System
 ```
 
-### 2. Backend setup
+### Step 2 — Backend setup
 
 ```bash
 cd backend
@@ -327,23 +437,23 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 3. Configure environment variables
+### Step 3 — Configure environment variables
 
 ```bash
 cp .env.example .env
 # Edit .env with your database credentials and Resend API key
 ```
 
-> ⚠️ Only the keys listed in `.env.example` are accepted — `pydantic-settings` is configured to reject unknown environment variables at startup.
+> **Note:** Only the keys listed in `.env.example` are accepted — `pydantic-settings` is configured to reject unknown environment variables at startup.
 
-### 4. Initialize the database
+### Step 4 — Initialize the database
 
 ```bash
 python setup_db.py        # Creates the 'event_management' database (idempotent)
 python create_tables.py   # Creates users/events/registrations tables + verifies schema
 ```
 
-### 5. Run the backend
+### Step 5 — Run the backend
 
 ```bash
 uvicorn app.main:app --reload
@@ -351,7 +461,7 @@ uvicorn app.main:app --reload
 
 The API is now at `http://localhost:8000` — Swagger UI at `http://localhost:8000/docs`.
 
-### 6. Frontend setup
+### Step 6 — Frontend setup
 
 ```bash
 cd ../frontend
@@ -366,6 +476,8 @@ npm run dev
 The app opens at `http://localhost:5173` (this origin is already in the backend CORS allow-list).
 
 > **Local development note:** `frontend/src/utils/apiConfig.js` points to the deployed Render backend. For fully local development, change `API_BASE_URL` to `http://localhost:8000`. When `RESEND_API_KEY` is empty, the backend logs reset links to the console instead of sending emails (dev fallback).
+
+---
 
 ## 🔧 Environment Variables
 
@@ -387,20 +499,19 @@ All variables live in `backend/.env` (template: `backend/.env.example`). Placeho
 | `FRONTEND_URL` | Frontend origin used in reset links | `http://localhost:5173` |
 | `RESET_TOKEN_EXPIRE_MINUTES` | Reset token lifetime | `15` |
 
+---
+
 ## 📸 Screenshots
 
-> Screenshots live in `docs/screenshots/`. Drop a PNG in that folder and reference it here.
+> Gallery placeholders — drop real captures into `docs/screenshots/` and update the `src` paths below.
 
-| Screen | Screenshot |
-|---|---|
-| Home | `<!-- docs/screenshots/home.png -->` |
-| Login | `<!-- docs/screenshots/login.png -->` |
-| Signup | `<!-- docs/screenshots/signup.png -->` |
-| User Dashboard | `<!-- docs/screenshots/dashboard.png -->` |
-| Organizer Dashboard | `<!-- docs/screenshots/organizer-dashboard.png -->` |
-| Admin Dashboard | `<!-- docs/screenshots/admin-dashboard.png -->` |
-| Events | `<!-- docs/screenshots/events.png -->` |
-| Event Details | `<!-- docs/screenshots/event-details.png -->` |
+| Home | Login | Signup | Dashboard |
+|---|---|---|---|
+| <img src="https://placehold.co/600x400/e9e9e9/555555?text=Home" alt="Home" width="300"> | <img src="https://placehold.co/600x400/e9e9e9/555555?text=Login" alt="Login" width="300"> | <img src="https://placehold.co/600x400/e9e9e9/555555?text=Signup" alt="Signup" width="300"> | <img src="https://placehold.co/600x400/e9e9e9/555555?text=Dashboard" alt="User Dashboard" width="300"> |
+| **Organizer Dashboard** | **Admin Dashboard** | **Events** | **Event Details** |
+| <img src="https://placehold.co/600x400/e9e9e9/555555?text=Organizer+Dashboard" alt="Organizer Dashboard" width="300"> | <img src="https://placehold.co/600x400/e9e9e9/555555?text=Admin+Dashboard" alt="Admin Dashboard" width="300"> | <img src="https://placehold.co/600x400/e9e9e9/555555?text=Events" alt="Events listing" width="300"> | <img src="https://placehold.co/600x400/e9e9e9/555555?text=Event+Details" alt="Event details" width="300"> |
+
+---
 
 ## 🚧 Future Improvements
 
@@ -411,13 +522,19 @@ All variables live in `backend/.env` (template: `backend/.env.example`). Placeho
 - **Analytics dashboard** — attendance trends, capacity utilization, popular categories
 - **Push notifications** — reminders for upcoming events via email/SMS/Web Push
 
+---
+
 ## 📄 License
 
 Distributed under the **MIT License**. See the [`LICENSE`](LICENSE) file for details.
 
+---
+
 ## 👤 Author
 
 **Aaryan Thota** — [@AaryanThota26](https://github.com/AaryanThota26)
+
+---
 
 ## 🤝 Contributing
 
@@ -430,17 +547,11 @@ Contributions are welcome! Here's how to get started:
 
 Please keep changes focused, run the existing verification scripts (`backend/test_auth.py`, `backend/validate_models.py`) before submitting, and follow the existing code style. For major changes, open an issue first to discuss.
 
+---
+
 ## 🙏 Acknowledgements
 
 - [FastAPI](https://fastapi.tiangolo.com) and [SQLAlchemy](https://www.sqlalchemy.org) for a backend that documents itself
 - [React](https://react.dev), [Vite](https://vite.dev), and [Tailwind CSS](https://tailwindcss.com) for the frontend experience
 - [Neon](https://neon.tech) for managed PostgreSQL, [Resend](https://resend.com) for transactional email
-- [Vercel](https://vercel.com) and [Render](https://render.com) for free-tier hosting that made the live demo possible
-
----
-
-<div align="center">
-
-**Built with ❤️ using FastAPI, React, and PostgreSQL**
-
-</div>
+- [Vercel](https://vercel.com) and [Render](https://render.com) for hosting the live demo
