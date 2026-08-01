@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🎫 Event Management System
+# 🎫 Moving
 
 **A full-stack event platform with role-based access — organizers publish events, admins curate them, and users register in one click.**
 
@@ -54,7 +54,7 @@
 
 ## 📖 Overview
 
-Planning an event is hard enough without a dozen spreadsheets, email threads, and DMs to keep track of who's coming. **Event Management System (EventPro)** replaces that chaos with a single, role-based platform:
+Planning an event is hard enough without a dozen spreadsheets, email threads, and DMs to keep track of who's coming. **Moving** replaces that chaos with a single, role-based platform:
 
 - **Organizers** publish events and watch registrations roll in, complete with a participant list.
 - **Admins** run a moderation queue — nothing goes live until it's approved.
