@@ -4,7 +4,7 @@
  * Central configuration for API endpoints.
  */
 
-const API_BASE_URL = 'http://localhost:8000'
+const API_BASE_URL = "https://event-management-api-aw25.onrender.com";
 
 const apiConfig = {
   baseURL: API_BASE_URL,
