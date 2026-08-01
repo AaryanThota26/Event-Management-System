@@ -42,7 +42,6 @@
 - [📡 API Endpoints](#api-endpoints)
 - [🚀 Installation](#installation)
 - [🔧 Environment Variables](#environment-variables)
-- [📸 Screenshots](#screenshots)
 - [🚧 Future Improvements](#future-improvements)
 - [📄 License](#license)
 - [👤 Author](#author)
@@ -50,6 +49,8 @@
 - [🙏 Acknowledgements](#acknowledgements)
 
 ---
+
+<a id="overview"></a>
 
 ## 📖 Overview
 
@@ -63,6 +64,8 @@ Every event has a hard capacity limit, duplicate sign-ups are impossible by desi
 
 ---
 
+<a id="project-highlights"></a>
+
 ## 💡 Project Highlights
 
 - **Three-role platform** — `user`, `organizer`, and `admin` each get their own dashboard, permissions, and server-enforced access control.
@@ -73,6 +76,8 @@ Every event has a hard capacity limit, duplicate sign-ups are impossible by desi
 - **Deployed end-to-end** — React on Vercel, FastAPI on Render, PostgreSQL on Neon, transactional email via Resend.
 
 ---
+
+<a id="quick-start"></a>
 
 ## 🚀 Quick Start
 
@@ -106,6 +111,8 @@ Full walkthrough with prerequisites → [🚀 Installation](#installation).
 
 ---
 
+<a id="live-demo"></a>
+
 ## 🔗 Live Demo
 
 | Service | URL |
@@ -117,6 +124,8 @@ Full walkthrough with prerequisites → [🚀 Installation](#installation).
 > These are the URLs wired into the codebase (CORS origins and the frontend API client). If you redeploy, update the CORS list in `backend/app/main.py` and `API_BASE_URL` in `frontend/src/utils/apiConfig.js`.
 
 ---
+
+<a id="features"></a>
 
 ## ✨ Features
 
@@ -165,6 +174,8 @@ Full walkthrough with prerequisites → [🚀 Installation](#installation).
 
 ---
 
+<a id="tech-stack"></a>
+
 ## 🛠️ Tech Stack
 
 | Layer | Technology | Purpose |
@@ -182,6 +193,8 @@ Full walkthrough with prerequisites → [🚀 Installation](#installation).
 | **Deployment** | [Vercel](https://vercel.com) + [Render](https://render.com) | Frontend hosting, backend hosting |
 
 ---
+
+<a id="system-architecture"></a>
 
 ## 🏗️ System Architecture
 
@@ -215,6 +228,8 @@ Full walkthrough with prerequisites → [🚀 Installation](#installation).
 The backend follows a clean **router → service → model** layering: API routes (`app/api/`) handle HTTP concerns and authorization, services (`app/services/`) contain all business rules (capacity checks, approval workflow, ownership checks), and models (`app/models/`) define the schema. The browser talks to the React SPA, which calls the FastAPI REST API with a JWT bearer token; the backend persists through SQLAlchemy into Neon-hosted PostgreSQL, and the password-reset flow reaches users through the Resend email service.
 
 ---
+
+<a id="project-structure"></a>
 
 ## 📁 Project Structure
 
@@ -271,6 +286,8 @@ event-management-system/
 ```
 
 ---
+
+<a id="database-design"></a>
 
 ## 🗄️ Database Design
 
@@ -329,6 +346,8 @@ users ──────┬──< events ──────< registrations >─
 
 ---
 
+<a id="authentication-flow"></a>
+
 ## 🔑 Authentication Flow
 
 ```
@@ -348,6 +367,8 @@ users ──────┬──< events ──────< registrations >─
 
 ---
 
+<a id="user-roles"></a>
+
 ## 👥 User Roles
 
 | Role | Can do | Redirected to |
@@ -359,6 +380,8 @@ users ──────┬──< events ──────< registrations >─
 Role membership is assigned at signup (defaults to `user`) and is enforced twice: **client-side** (protected routes with `allowedRoles` redirect unauthorized users to their own dashboard) and **server-side** (the `require_role` dependency returns `403` with the required-vs-actual role message).
 
 ---
+
+<a id="api-endpoints"></a>
 
 ## 📡 API Endpoints
 
@@ -405,6 +428,8 @@ Base URL: `https://event-management-api-aw25.onrender.com` · Interactive docs a
 Plus health endpoints: `GET /` (service info + docs link) and `GET /health` (readiness probe).
 
 ---
+
+<a id="installation"></a>
 
 ## 🚀 Installation
 
@@ -479,6 +504,8 @@ The app opens at `http://localhost:5173` (this origin is already in the backend 
 
 ---
 
+<a id="environment-variables"></a>
+
 ## 🔧 Environment Variables
 
 All variables live in `backend/.env` (template: `backend/.env.example`). Placeholder values shown.
@@ -501,6 +528,8 @@ All variables live in `backend/.env` (template: `backend/.env.example`). Placeho
 
 ---
 
+<a id="future-improvements"></a>
+
 ## 🚧 Future Improvements
 
 - **QR code check-in** — generate a QR code per registration for fast on-site scanning
@@ -512,17 +541,23 @@ All variables live in `backend/.env` (template: `backend/.env.example`). Placeho
 
 ---
 
+<a id="license"></a>
+
 ## 📄 License
 
 Distributed under the **MIT License**. See the [`LICENSE`](LICENSE) file for details.
 
 ---
 
+<a id="author"></a>
+
 ## 👤 Author
 
 **Aaryan Thota** — [@AaryanThota26](https://github.com/AaryanThota26)
 
 ---
+
+<a id="contributing"></a>
 
 ## 🤝 Contributing
 
@@ -536,6 +571,8 @@ Contributions are welcome! Here's how to get started:
 Please keep changes focused, run the existing verification scripts (`backend/test_auth.py`, `backend/validate_models.py`) before submitting, and follow the existing code style. For major changes, open an issue first to discuss.
 
 ---
+
+<a id="acknowledgements"></a>
 
 ## 🙏 Acknowledgements
 
