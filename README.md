@@ -501,18 +501,6 @@ All variables live in `backend/.env` (template: `backend/.env.example`). Placeho
 
 ---
 
-## 📸 Screenshots
-
-> Gallery placeholders — drop real captures into `docs/screenshots/` and update the `src` paths below.
-
-| Home | Login | Signup | Dashboard |
-|---|---|---|---|
-| <img src="https://placehold.co/600x400/e9e9e9/555555?text=Home" alt="Home" width="300"> | <img src="https://placehold.co/600x400/e9e9e9/555555?text=Login" alt="Login" width="300"> | <img src="https://placehold.co/600x400/e9e9e9/555555?text=Signup" alt="Signup" width="300"> | <img src="https://placehold.co/600x400/e9e9e9/555555?text=Dashboard" alt="User Dashboard" width="300"> |
-| **Organizer Dashboard** | **Admin Dashboard** | **Events** | **Event Details** |
-| <img src="https://placehold.co/600x400/e9e9e9/555555?text=Organizer+Dashboard" alt="Organizer Dashboard" width="300"> | <img src="https://placehold.co/600x400/e9e9e9/555555?text=Admin+Dashboard" alt="Admin Dashboard" width="300"> | <img src="https://placehold.co/600x400/e9e9e9/555555?text=Events" alt="Events listing" width="300"> | <img src="https://placehold.co/600x400/e9e9e9/555555?text=Event+Details" alt="Event details" width="300"> |
-
----
-
 ## 🚧 Future Improvements
 
 - **QR code check-in** — generate a QR code per registration for fast on-site scanning
