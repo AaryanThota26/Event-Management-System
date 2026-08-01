@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🎫 Moving
+# 🎫 Event Management System
 
 **A full-stack event platform with role-based access — organizers publish events, admins curate them, and users register in one click.**
 
