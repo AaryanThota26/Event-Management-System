@@ -12,6 +12,7 @@ import AdminDashboard from './pages/AdminDashboard'
 import Events from './pages/Events'
 import EventDetail from './pages/EventDetail'
 import MyRegistrations from './pages/MyRegistrations'
+import LandingPage from './components/landing/LandingPage'
 import './App.css'
 
 function ProtectedRoute({ children, allowedRoles }) {
@@ -50,7 +51,7 @@ function App() {
           Skip to main content
         </a>
         <Routes>
-          <Route path="/" element={<HomePage />} />
+          <Route path="/" element={<LandingPage />} />
           <Route
             path="/login"
             element={
@@ -146,24 +147,6 @@ function App() {
         </Routes>
       </AuthProvider>
     </Router>
-  )
-}
-
-function HomePage() {
-  return (
-    <div className="home-page min-h-screen flex flex-col items-center justify-center bg-surface-bright p-xl" id="main-content">
-      <span className="material-symbols-outlined text-6xl text-primary mb-lg" aria-hidden="true">calendar_today</span>
-      <h1 className="font-display-lg text-display-lg text-on-background mb-md text-center">EventPro</h1>
-      <p className="text-body-lg text-on-surface-variant mb-xl text-center max-w-lg">
-        Welcome to the Event Management System. Please sign in to continue.
-      </p>
-      <a
-        href="/login"
-        className="px-xl py-md bg-primary text-on-primary rounded-lg font-label-md hover:bg-primary-container transition-colors shadow-md"
-      >
-        Sign In
-      </a>
-    </div>
   )
 }
 

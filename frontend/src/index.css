@@ -9,6 +9,15 @@
 /* Prevent horizontal layout shift from scrollbar appearing/disappearing */
 html {
   scrollbar-gutter: stable;
+  scroll-behavior: smooth;
+}
+
+:root {
+  --section-y: 96px;
+  --color-outline-variant: #c3c6d7;
+  --color-primary: #004ac6;
+  --color-on-surface: #0b1c30;
+  --color-on-surface-variant: #434655;
 }
 
 /* Base body styles matching Stitch design */
@@ -128,4 +137,143 @@ body {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border-width: 0;
+}
+
+/* === LANDING PAGE === */
+
+.landing-section {
+  padding-top: var(--section-y);
+  padding-bottom: var(--section-y);
+}
+
+.landing-section--alt {
+  background-color: #f1f5ff;
+}
+
+/* Scroll anchor offset for sticky navbar */
+.anchor-target {
+  scroll-margin-top: 96px;
+}
+
+/* Tech marquee — infinite translateX loop */
+.tech-marquee {
+  display: flex;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 12%,
+    black 88%,
+    transparent
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 12%,
+    black 88%,
+    transparent
+  );
+}
+
+.tech-marquee__track {
+  display: flex;
+  flex-shrink: 0;
+  gap: 16px;
+  padding-right: 16px;
+  animation: tech-marquee-scroll 32s linear infinite;
+}
+
+.tech-marquee:hover .tech-marquee__track {
+  animation-play-state: paused;
+}
+
+@keyframes tech-marquee-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Hero preview — floating dashboard cards */
+.hero-preview__card {
+  animation: hero-card-float 6s ease-in-out infinite;
+}
+
+.hero-preview__card--delay-1 {
+  animation-delay: -2s;
+}
+
+.hero-preview__card--delay-2 {
+  animation-delay: -4s;
+}
+
+@keyframes hero-card-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Pulsing status dot for live indicators */
+.landing-pulse {
+  position: relative;
+}
+
+.landing-pulse::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: currentColor;
+  opacity: 0.4;
+  animation: landing-pulse-ring 1.8s ease-out infinite;
+}
+
+@keyframes landing-pulse-ring {
+  0% {
+    transform: scale(1);
+    opacity: 0.4;
+  }
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
+/* Dashboard showcase browser chrome */
+.showcase-window {
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid var(--color-outline-variant, #c3c6d7);
+  box-shadow: 0 24px 60px -20px rgba(11, 28, 48, 0.18);
+  overflow: hidden;
+}
+
+.showcase-window__bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e5eeff;
+  background: #f8f9ff;
+}
+
+.showcase-window__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 9999px;
+}
+
+/* Respect reduced motion for landing animations */
+@media (prefers-reduced-motion: reduce) {
+  .tech-marquee__track,
+  .hero-preview__card,
+  .landing-pulse::after {
+    animation: none !important;
+  }
 }
