@@ -20,7 +20,11 @@ import LandingPage from './components/landing/LandingPage'
 import './App.css'
 
 function ProtectedRoute({ children, allowedRoles }) {
-  const { token, user } = useAuth()
+  const { token, user, loggingOut } = useAuth()
+  // Intentional logout is in flight (auth cleared, router still leaving the
+  // protected page). Render nothing rather than redirect to /login so the
+  // login page never flashes for even a single frame.
+  if (loggingOut) return null
   if (!token) return <Navigate to="/login" replace />
   // If the route requires specific roles, enforce them
   if (allowedRoles && user && !allowedRoles.includes(user.role)) {

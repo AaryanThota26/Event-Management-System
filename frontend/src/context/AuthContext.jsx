@@ -1,4 +1,5 @@
 import { createContext, useState, useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
 import api from '../services/api'
 
 // eslint-disable-next-line react/only-export-components
@@ -9,7 +10,14 @@ const STORAGE_KEYS = {
   user: 'eventpro_user',
 }
 
+const isProtectedPath = (pathname) =>
+  pathname.startsWith('/events') ||
+  pathname.startsWith('/user/') ||
+  pathname.startsWith('/organizer/') ||
+  pathname.startsWith('/admin/')
+
 export function AuthProvider({ children }) {
+  const { pathname } = useLocation()
   const [user, setUser] = useState(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEYS.user)
@@ -24,6 +32,11 @@ export function AuthProvider({ children }) {
   )
 
   const [loading, setLoading] = useState(false)
+
+  // True only during an intentional logout, while the (deferred) router
+  // navigation away from the protected page is still committing. Prevents
+  // ProtectedRoute from redirecting to /login in that window.
+  const [loggingOut, setLoggingOut] = useState(false)
 
   useEffect(() => {
     if (token) {
@@ -41,8 +54,17 @@ export function AuthProvider({ children }) {
     }
   }, [user])
 
+  // Once the deferred logout navigation commits to a public route, clear the
+  // in-progress flag so the app guards normally again.
+  useEffect(() => {
+    if (loggingOut && !isProtectedPath(pathname)) {
+      setLoggingOut(false)
+    }
+  }, [pathname, loggingOut])
+
   const login = async (email, password) => {
     setLoading(true)
+    setLoggingOut(false)
     try {
       const response = await api.post('/api/auth/login', { email, password })
       const { access_token, user: userData } = response.data
@@ -64,6 +86,7 @@ export function AuthProvider({ children }) {
   }
 
   const logout = () => {
+    setLoggingOut(true)
     localStorage.removeItem(STORAGE_KEYS.token)
     localStorage.removeItem(STORAGE_KEYS.user)
     setToken(null)
@@ -71,7 +94,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, token, loading, loggingOut, login, logout }}>
       {children}
     </AuthContext.Provider>
   )

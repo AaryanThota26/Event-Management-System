@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, NavLink } from 'react-router-dom'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import EventProLogo from './EventProLogo'
 import LogoutConfirmModal from './LogoutConfirmModal'
@@ -32,12 +32,14 @@ const NAV_LINKS = {
 
 const AuthenticatedLayout = ({ children }) => {
   const { user, logout } = useAuth()
+  const navigate = useNavigate()
   const [showLogoutModal, setShowLogoutModal] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const handleLogout = () => {
     logout()
-    window.location.href = '/'
+    // Replace the dashboard entry so Back cannot return to a protected page.
+    navigate('/', { replace: true })
   }
 
   const dashboardUrl = DASHBOARD_ROUTE[user?.role] || '/user/dashboard'
