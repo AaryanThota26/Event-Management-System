@@ -41,6 +41,7 @@
 - [👥 User Roles](#user-roles)
 - [📡 API Endpoints](#api-endpoints)
 - [🚀 Installation](#installation)
+- [🧪 Development vs Production Configuration](#dev-vs-prod-configuration)
 - [🔧 Environment Variables](#environment-variables)
 - [🚧 Future Improvements](#future-improvements)
 - [📄 License](#license)
@@ -121,7 +122,7 @@ Full walkthrough with prerequisites → [🚀 Installation](#installation).
 | Backend API | [event-management-api-aw25.onrender.com](https://event-management-api-aw25.onrender.com) |
 | Swagger Docs | [event-management-api-aw25.onrender.com/docs](https://event-management-api-aw25.onrender.com/docs) |
 
-> These are the URLs wired into the codebase (CORS origins and the frontend API client). If you redeploy, update the CORS list in `backend/app/main.py` and `API_BASE_URL` in `frontend/src/utils/apiConfig.js`.
+> These are the deployed URLs. They are resolved from environment variables: `VITE_API_BASE_URL` (frontend) and `CORS_ORIGINS` (backend). See [🧪 Development vs Production Configuration](#dev-vs-prod-configuration).
 
 ---
 
@@ -282,7 +283,10 @@ event-management-system/
     │   ├── App.jsx                 # Routes + role-based route guards
     │   └── main.jsx                # React entry point
     ├── package.json
-    └── vercel.json                 # SPA rewrite rules for Vercel
+    ├── vercel.json                 # SPA rewrite rules for Vercel
+    ├── .env.example                # Environment template (dev = localhost:8000)
+    ├── .env.local.example          # Local override template
+    └── .env.production.example     # Production build template (Render URL)
 ```
 
 ---
@@ -500,7 +504,54 @@ npm run dev
 
 The app opens at `http://localhost:5173` (this origin is already in the backend CORS allow-list).
 
-> **Local development note:** `frontend/src/utils/apiConfig.js` points to the deployed Render backend. For fully local development, change `API_BASE_URL` to `http://localhost:8000`. When `RESEND_API_KEY` is empty, the backend logs reset links to the console instead of sending emails (dev fallback).
+> **Local development note:** The frontend targets the backend defined by `VITE_API_BASE_URL`. `npm run dev` defaults to `http://localhost:8000`, so local testing never touches the deployed Render backend. To be explicit, create `frontend/.env.local` from `frontend/.env.local.example`. When `RESEND_API_KEY` is empty, the backend logs reset links to the console instead of sending emails (dev fallback).
+
+---
+
+<a id="dev-vs-prod-configuration"></a>
+
+## 🧪 Development vs Production Configuration
+
+The project is fully **environment-driven** — local development is isolated from the deployed stack so testing never affects live data.
+
+```
+DEVELOPMENT                        PRODUCTION
+-----------                        ----------
+React (localhost:5173)             Vercel Frontend
+        │                                │
+        ▼                                ▼
+FastAPI (localhost:8000)           Render FastAPI
+        │                                │
+        ▼                                ▼
+Local PostgreSQL                   Neon PostgreSQL
+```
+
+### Frontend (`frontend/`)
+
+| Mode | Variable | Value |
+|---|---|---|
+| Development (`npm run dev`) | `VITE_API_BASE_URL` | `http://localhost:8000` |
+| Production (`npm run build` / Vercel) | `VITE_API_BASE_URL` | `https://event-management-api-aw25.onrender.com` |
+
+- Resolved in `frontend/src/utils/apiConfig.js` from `import.meta.env.VITE_API_BASE_URL`.
+- If the variable is unset, a safe environment-specific default applies: **dev → `localhost:8000`, production → Render** — the app never silently targets a cross-environment backend.
+- Vite env files (templates committed): `.env.example`, `.env.local.example` (copy to `.env.local` for local overrides), `.env.production.example` (copy to `.env.production` for local production builds).
+- **Vercel:** set `VITE_API_BASE_URL` in **Vercel → Project → Settings → Environment Variables** so production builds use the Render API.
+
+### Backend (`backend/`)
+
+| Mode | Source | Example value |
+|---|---|---|
+| Development | `backend/.env` | `DATABASE_URL=postgresql://postgres:postgres@localhost:5432/event_management` |
+| Production | Render service env vars | `DATABASE_URL=postgresql://neondb_owner:...@...neon.tech/neondb` |
+
+- `DATABASE_URL` (full connection string) **takes priority**; the individual `DB_HOST` / `DB_PORT` / `DB_USER` / `DB_PASSWORD` / `DB_NAME` fields remain as a fallback. Resolved in `backend/app/core/config.py` via `settings.effective_database_url`.
+- `backend/setup_db.py` and `backend/create_tables.py` read the same `backend/.env`, so tables are created in the **local** database during development.
+- CORS origins come from `CORS_ORIGINS` (comma-separated) in `backend/.env`. The defaults cover the local Vite dev servers (`5173`, `5174`) and the Vercel production origin.
+- `FRONTEND_URL` must match the frontend origin used in password-reset emails: `http://localhost:5173` in dev, the Vercel URL in production.
+- **Render:** set `DATABASE_URL` (plus `SECRET_KEY`, `RESEND_API_KEY`, `FRONTEND_URL`) in **Render → Web Service → Environment** — these override anything in the repo.
+
+> ⚠️ Never point local development at the production Render/Neon `DATABASE_URL` — that would read and write live production data.
 
 ---
 
@@ -508,19 +559,29 @@ The app opens at `http://localhost:5173` (this origin is already in the backend 
 
 ## 🔧 Environment Variables
 
-All variables live in `backend/.env` (template: `backend/.env.example`). Placeholder values shown.
+Backend variables live in `backend/.env` (template: `backend/.env.example`). Frontend variables live in `frontend/.env*` (templates in `frontend/.env*.example`). Placeholder values shown.
+
+### Frontend
 
 | Variable | Description | Example |
 |---|---|---|
-| `DB_HOST` | PostgreSQL host | `localhost` |
-| `DB_PORT` | PostgreSQL port | `5432` |
-| `DB_USER` | Database user | `postgres` |
-| `DB_PASSWORD` | Database password | `your_actual_password_here` |
-| `DB_NAME` | Database name | `event_management` |
+| `VITE_API_BASE_URL` | FastAPI backend base URL | `http://localhost:8000` (dev) / `https://event-management-api-aw25.onrender.com` (prod) |
+
+### Backend
+
+| Variable | Description | Example |
+|---|---|---|
+| `DATABASE_URL` | Full PostgreSQL connection string (priority) | `postgresql://postgres:pass@localhost:5432/event_management` |
+| `DB_HOST` | PostgreSQL host (fallback) | `localhost` |
+| `DB_PORT` | PostgreSQL port (fallback) | `5432` |
+| `DB_USER` | Database user (fallback) | `postgres` |
+| `DB_PASSWORD` | Database password (fallback) | `your_actual_password_here` |
+| `DB_NAME` | Database name (fallback) | `event_management` |
 | `SECRET_KEY` | JWT signing key — use a long random string in production | `change-me-in-production` |
 | `ALGORITHM` | JWT signing algorithm | `HS256` |
 | `ACCESS_TOKEN_EXPIRE_MINUTES` | Access token lifetime | `30` |
 | `DEBUG` | SQL echo + verbose logging | `True` |
+| `CORS_ORIGINS` | Comma-separated allowed frontend origins | `http://localhost:5173,https://...vercel.app` |
 | `RESEND_API_KEY` | Resend API key for reset emails | `re_xxxxxxxxxxxxxxxx` |
 | `RESEND_FROM_EMAIL` | Sender address | `EventPro <onboarding@resend.dev>` |
 | `FRONTEND_URL` | Frontend origin used in reset links | `http://localhost:5173` |

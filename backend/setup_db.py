@@ -11,16 +11,28 @@ Usage: python setup_db.py
 import subprocess
 import sys
 import os
+from urllib.parse import urlparse
 from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv(os.path.join(os.path.dirname(__file__), '.env'))
 
-DB_USER = os.getenv('DB_USER', 'postgres')
-DB_PASSWORD = os.getenv('DB_PASSWORD', 'postgres')
-DB_HOST = os.getenv('DB_HOST', 'localhost')
-DB_PORT = os.getenv('DB_PORT', '5432')
-DB_NAME = os.getenv('DB_NAME', 'event_management')
+DATABASE_URL = os.getenv('DATABASE_URL')
+
+if DATABASE_URL:
+    # Full connection string (e.g. postgresql://user:pass@host:port/dbname)
+    parsed = urlparse(DATABASE_URL)
+    DB_USER = parsed.username or 'postgres'
+    DB_PASSWORD = parsed.password or 'postgres'
+    DB_HOST = parsed.hostname or 'localhost'
+    DB_PORT = parsed.port or 5432
+    DB_NAME = parsed.path.lstrip('/') or 'event_management'
+else:
+    DB_USER = os.getenv('DB_USER', 'postgres')
+    DB_PASSWORD = os.getenv('DB_PASSWORD', 'postgres')
+    DB_HOST = os.getenv('DB_HOST', 'localhost')
+    DB_PORT = os.getenv('DB_PORT', '5432')
+    DB_NAME = os.getenv('DB_NAME', 'event_management')
 
 
 def get_psql_path():

@@ -22,7 +22,7 @@ class Base(DeclarativeBase):
 
 # Create the SQLAlchemy engine
 engine = create_engine(
-    settings.DATABASE_URL,
+    settings.effective_database_url,
     echo=settings.DEBUG,         # Log SQL queries when DEBUG=True
     pool_pre_ping=True,          # Verify connections before use
     pool_size=5,                 # Connection pool size

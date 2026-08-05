@@ -24,14 +24,11 @@ def create_app() -> FastAPI:
     # CORS Middleware - Allow frontend to communicate with backend
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["http://localhost:5173",
-                        "http://localhost:5173",
-                        "http://127.0.0.1:5173",
-                        "http://localhost:5174",
-                        "http://127.0.0.1:5174",
-                        "https://event-management-system-ruby-gamma.vercel.app",
-],  
-        # Vite dev server
+        allow_origins=[
+            origin.strip()
+            for origin in settings.CORS_ORIGINS.split(",")
+            if origin.strip()
+        ],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
