@@ -1,68 +1,111 @@
 import { Link } from 'react-router-dom'
 import EventProLogo from '../EventProLogo'
-import { NAV_LINKS, AUTH_ROUTES, EXTERNAL_LINKS } from './links'
+import SectionLink from './SectionLink'
+import {
+  NAV_LINKS,
+  AUTH_ROUTES,
+  APP_ROUTES,
+  EXTERNAL_LINKS,
+} from './links'
 
-const FOOTER_LINKS = [
+const ColumnHeading = ({ children }) => (
+  <h3 className="text-label-sm font-semibold uppercase tracking-wider text-on-surface-variant mb-md">
+    {children}
+  </h3>
+)
+
+const FooterLink = ({ to, href, external, children }) => {
+  const baseClasses =
+    'font-label-md text-on-surface-variant hover:text-primary transition-colors'
+  if (to) {
+    return (
+      <Link to={to} className={baseClasses}>
+        {children}
+      </Link>
+    )
+  }
+  return (
+    <a
+      href={href}
+      target={external ? '_blank' : undefined}
+      rel={external ? 'noopener noreferrer' : undefined}
+      className={baseClasses}
+    >
+      {children}
+    </a>
+  )
+}
+
+const RESOURCE_LINKS = [
   { label: 'GitHub', href: EXTERNAL_LINKS.github, external: true },
   { label: 'API Docs', href: EXTERNAL_LINKS.apiDocs, external: true },
-  { label: 'Live Demo', href: EXTERNAL_LINKS.liveDemo, external: true },
-  { label: 'Contact', href: 'https://github.com/AaryanThota26/Event-Management-System/issues', external: true },
+  { label: 'Contact', href: EXTERNAL_LINKS.issues, external: true },
+  { label: 'Help Center', to: APP_ROUTES.help },
+  { label: 'Privacy Policy', to: APP_ROUTES.privacy },
+  { label: 'Terms of Service', to: APP_ROUTES.terms },
+]
+
+const ACCOUNT_LINKS = [
+  { label: 'Log In', to: AUTH_ROUTES.login },
+  { label: 'Sign Up', to: AUTH_ROUTES.signup },
 ]
 
 const Footer = () => {
   return (
     <footer className="border-t border-outline-variant/60 bg-surface-bright">
       <div className="max-w-[1440px] mx-auto px-lg sm:px-xl py-xl">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-lg">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-xl">
           <div>
             <Link to="/" aria-label="EventPro home">
               <EventProLogo />
             </Link>
-            <p className="text-body-sm text-on-surface-variant mt-sm max-w-xs">
+            <p className="text-body-sm text-on-surface-variant mt-md max-w-xs">
               Plan, approve, and register for events — beautifully.
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-sm">
-            {NAV_LINKS.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                className="px-md py-sm rounded-lg font-label-md text-on-surface-variant hover:text-primary transition-colors"
-              >
-                {link.label}
-              </a>
-            ))}
-            <Link
-              to={AUTH_ROUTES.login}
-              className="px-md py-sm rounded-lg font-label-md text-on-surface-variant hover:text-primary transition-colors"
-            >
-              Log in
-            </Link>
-            <Link
-              to={AUTH_ROUTES.signup}
-              className="px-md py-sm rounded-lg font-label-md text-on-surface-variant hover:text-primary transition-colors"
-            >
-              Sign up
-            </Link>
-          </div>
+          <nav aria-label="Product">
+            <ColumnHeading>Product</ColumnHeading>
+            <ul className="space-y-sm">
+              {NAV_LINKS.map((link) => (
+                <li key={link.id}>
+                  <SectionLink
+                    id={link.id}
+                    label={link.label}
+                    className="font-label-md text-on-surface-variant hover:text-primary transition-colors"
+                  />
+                </li>
+              ))}
+            </ul>
+          </nav>
 
-          <div className="flex flex-wrap items-center gap-sm">
-            {FOOTER_LINKS.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                target={link.external ? '_blank' : undefined}
-                rel={link.external ? 'noopener noreferrer' : undefined}
-                className="px-md py-sm rounded-lg border border-outline-variant bg-surface-container-lowest font-label-md text-on-surface hover:bg-surface-container hover:border-primary/30 transition-colors inline-flex items-center gap-xs"
-              >
-                {link.label}
-                {link.external && (
-                  <span className="material-symbols-outlined text-[16px]" aria-hidden="true">open_in_new</span>
-                )}
-              </a>
-            ))}
-          </div>
+          <nav aria-label="Account">
+            <ColumnHeading>Account</ColumnHeading>
+            <ul className="space-y-sm">
+              {ACCOUNT_LINKS.map((link) => (
+                <li key={link.label}>
+                  <FooterLink to={link.to}>{link.label}</FooterLink>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          <nav aria-label="Resources">
+            <ColumnHeading>Resources</ColumnHeading>
+            <ul className="space-y-sm">
+              {RESOURCE_LINKS.map((link) => (
+                <li key={link.label}>
+                  <FooterLink
+                    to={link.to}
+                    href={link.href}
+                    external={link.external}
+                  >
+                    {link.label}
+                  </FooterLink>
+                </li>
+              ))}
+            </ul>
+          </nav>
         </div>
 
         <div className="mt-xl pt-lg border-t border-outline-variant/60 flex flex-col sm:flex-row items-center justify-between gap-sm">

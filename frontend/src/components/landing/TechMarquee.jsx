@@ -27,7 +27,7 @@ const TechChip = ({ tech }) => (
 const TechMarquee = () => {
   const doubled = [...TECHNOLOGIES, ...TECHNOLOGIES]
   return (
-    <section className="landing-section border-y border-outline-variant/60 bg-surface-bright" id="tech-stack" aria-label="Technology stack">
+    <section className="landing-section border-y border-outline-variant/60 bg-surface-bright anchor-target" id="tech-stack" aria-label="Technology stack">
       <div className="max-w-[1440px] mx-auto px-lg sm:px-xl">
         <Reveal className="text-center mb-10">
           <h2 className="font-headline-md text-headline-md font-semibold text-on-surface tracking-tight">

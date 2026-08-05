@@ -27,7 +27,7 @@ const STEPS = [
 
 const HowItWorks = () => {
   return (
-    <section className="landing-section landing-section--alt" id="how-it-works">
+    <section className="landing-section landing-section--alt anchor-target" id="how-it-works">
       <div className="max-w-[1440px] mx-auto px-lg sm:px-xl">
         <SectionHeading
           eyebrow="How It Works"

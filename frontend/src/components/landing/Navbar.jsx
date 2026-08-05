@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import EventProLogo from '../EventProLogo'
+import SectionLink from './SectionLink'
 import { NAV_LINKS, AUTH_ROUTES } from './links'
 
 const Navbar = () => {
@@ -37,13 +38,12 @@ const Navbar = () => {
             aria-label="Main navigation"
           >
             {NAV_LINKS.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
+              <SectionLink
+                key={link.id}
+                id={link.id}
+                label={link.label}
                 className="font-label-md text-on-surface-variant hover:text-primary transition-colors"
-              >
-                {link.label}
-              </a>
+              />
             ))}
           </nav>
 
@@ -76,23 +76,22 @@ const Navbar = () => {
       <AnimatePresence>
         {mobileOpen && (
           <motion.nav
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-            className="md:hidden overflow-hidden bg-surface-bright/95 backdrop-blur-xl border-t border-outline-variant/60"
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+            className="md:hidden bg-surface-bright/95 backdrop-blur-xl border-t border-outline-variant/60"
             aria-label="Mobile navigation"
           >
             <div className="px-lg py-md flex flex-col gap-sm">
               {NAV_LINKS.map((link) => (
-                <a
-                  key={link.href}
-                  href={link.href}
+                <SectionLink
+                  key={link.id}
+                  id={link.id}
+                  label={link.label}
                   onClick={() => setMobileOpen(false)}
                   className="px-md py-sm rounded-lg font-label-md text-on-surface-variant hover:bg-surface-container hover:text-primary transition-colors"
-                >
-                  {link.label}
-                </a>
+                />
               ))}
               <div className="border-t border-outline-variant my-sm" />
               <Link

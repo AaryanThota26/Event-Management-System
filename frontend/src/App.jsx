@@ -1,4 +1,5 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import { useEffect } from 'react'
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import { useAuth } from './hooks/useAuth'
 import AuthenticatedLayout from './components/AuthenticatedLayout'
@@ -12,6 +13,9 @@ import AdminDashboard from './pages/AdminDashboard'
 import Events from './pages/Events'
 import EventDetail from './pages/EventDetail'
 import MyRegistrations from './pages/MyRegistrations'
+import PrivacyPolicy from './pages/PrivacyPolicy'
+import TermsOfService from './pages/TermsOfService'
+import HelpCenter from './pages/HelpCenter'
 import LandingPage from './components/landing/LandingPage'
 import './App.css'
 
@@ -42,6 +46,14 @@ const ROLE_REDIRECT = {
   user: '/user/dashboard',
 }
 
+function ScrollToTop() {
+  const { pathname, hash } = useLocation()
+  useEffect(() => {
+    if (!hash) window.scrollTo(0, 0)
+  }, [pathname, hash])
+  return null
+}
+
 function App() {
   return (
     <Router>
@@ -50,8 +62,12 @@ function App() {
         <a className="skip-to-main" href="#main-content">
           Skip to main content
         </a>
+        <ScrollToTop />
         <Routes>
           <Route path="/" element={<LandingPage />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<TermsOfService />} />
+          <Route path="/help" element={<HelpCenter />} />
           <Route
             path="/login"
             element={

@@ -68,7 +68,9 @@ const ForgotPassword = () => {
 
       {/* Header Logo */}
       <header className="absolute top-0 left-0 w-full p-lg flex justify-center lg:justify-start">
-        <EventProLogo />
+        <Link to="/" aria-label="EventPro home">
+          <EventProLogo />
+        </Link>
       </header>
 
       <main className="w-full max-w-[480px] z-10" id="main-content">
@@ -176,15 +178,15 @@ const ForgotPassword = () => {
 
         {/* Footer Links */}
         <footer className="mt-xl flex justify-center gap-xl text-label-sm text-label-sm text-on-surface-variant">
-          <a className="hover:text-primary transition-colors" href="#">
+          <Link className="hover:text-primary transition-colors" to="/privacy">
             Privacy Policy
-          </a>
-          <a className="hover:text-primary transition-colors" href="#">
+          </Link>
+          <Link className="hover:text-primary transition-colors" to="/terms">
             Terms of Service
-          </a>
-          <a className="hover:text-primary transition-colors" href="#">
+          </Link>
+          <Link className="hover:text-primary transition-colors" to="/help">
             Help Center
-          </a>
+          </Link>
         </footer>
       </main>
 

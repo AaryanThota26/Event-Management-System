@@ -32,12 +32,12 @@ const CallToAction = () => {
                   Get Started Free
                 </Link>
                 <a
-                  href={EXTERNAL_LINKS.liveDemo}
+                  href={EXTERNAL_LINKS.apiDocs}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full sm:w-auto px-xl py-md rounded-lg border border-white/20 text-white font-label-md hover:bg-white/10 transition-colors inline-flex items-center justify-center gap-xs"
                 >
-                  Explore Live Demo
+                  View API Docs
                   <span className="material-symbols-outlined text-[18px]" aria-hidden="true">open_in_new</span>
                 </a>
               </div>

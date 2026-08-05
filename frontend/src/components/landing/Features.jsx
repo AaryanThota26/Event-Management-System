@@ -48,7 +48,7 @@ const FEATURES = [
 
 const Features = () => {
   return (
-    <section className="landing-section bg-surface-bright" id="features">
+    <section className="landing-section bg-surface-bright anchor-target" id="features">
       <div className="max-w-[1440px] mx-auto px-lg sm:px-xl">
         <SectionHeading
           eyebrow="Features"

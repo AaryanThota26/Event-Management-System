@@ -60,15 +60,12 @@ const Hero = () => {
               >
                 Get Started
               </Link>
-              <a
-                href={EXTERNAL_LINKS.liveDemo}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1 sm:flex-none px-xl py-md rounded-lg border border-outline-variant bg-surface-container-lowest text-on-surface font-label-md text-center hover:bg-surface-container transition-colors inline-flex items-center justify-center gap-xs"
+              <Link
+                to={AUTH_ROUTES.login}
+                className="flex-1 sm:flex-none px-xl py-md rounded-lg border border-outline-variant bg-surface-container-lowest text-on-surface font-label-md text-center hover:bg-surface-container transition-colors"
               >
-                Live Demo
-                <span className="material-symbols-outlined text-[18px]" aria-hidden="true">open_in_new</span>
-              </a>
+                Log In
+              </Link>
               <a
                 href={EXTERNAL_LINKS.github}
                 target="_blank"

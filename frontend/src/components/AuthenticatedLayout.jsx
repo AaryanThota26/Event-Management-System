@@ -35,6 +35,11 @@ const AuthenticatedLayout = ({ children }) => {
   const [showLogoutModal, setShowLogoutModal] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
+  const handleLogout = () => {
+    logout()
+    window.location.href = '/'
+  }
+
   const dashboardUrl = DASHBOARD_ROUTE[user?.role] || '/user/dashboard'
   const links = NAV_LINKS[user?.role] || []
   const badge = roleLabel[user?.role] || user?.role
@@ -166,7 +171,7 @@ const AuthenticatedLayout = ({ children }) => {
       {showLogoutModal && (
         <LogoutConfirmModal
           onClose={() => setShowLogoutModal(false)}
-          onConfirm={logout}
+          onConfirm={handleLogout}
         />
       )}
     </div>
